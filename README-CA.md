@@ -13,7 +13,7 @@ docker create -v /etc/rd-connect_keystore --name rd-connect_ca-store centos:7 /b
 2. Build container, tagging it locally:
 
 ```bash
-docker build -t rd-connect.eu/rd-connect_ca:0.1 rd-connect-common-key-generator
+docker build -t rd-connect.eu/rd-connect_ca:0.1 -t rd-connect.eu/rd-connect_ca:latest rd-connect-common-key-generator
 ```
 
 3. If you have to generate and get the certificates for another container (in the example, store in the directory `customdirectory` the certificates needed for `cas-ldap`), the commands are:

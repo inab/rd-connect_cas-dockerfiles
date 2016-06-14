@@ -59,6 +59,6 @@ if [ $# -gt 0 ]; then
 				--to-p12 --p12-name="${cert}" --password="${cert}" --outder --outfile "${certdir}"/keystore.p12
 		fi
 		echo "Copying RD-Connect '${cert}' keys"
-		cp -dpr "${certdir}" "${resDir}"
+		cp --no-preserve=mode,ownership --preserve=timestamps -r "${certdir}" "${resDir}"
 	done
 fi
