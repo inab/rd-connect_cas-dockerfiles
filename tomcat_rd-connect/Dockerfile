@@ -28,3 +28,4 @@ RUN	yum autoremove -y rpmdevtools
 RUN	yum clean all
 
 VOLUME	[ "/etc/tomcat7", "/var/lib/tomcat7" ]
+CMD	[ "/usr/sbin/init" ]
