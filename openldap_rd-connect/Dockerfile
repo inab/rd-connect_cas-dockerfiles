@@ -6,7 +6,7 @@ LABEL	Description="RD-Connect OpenLDAP setup" Vendor="CNIO" Version="1.0"
 
 ARG	CASBRANCH=cas-4.1.x
 ENV	CASCLONE=/tmp/ldap-cas-${CASBRANCH}
-ARG	CAS_LDAP_CERTS_DIR=/tmp/rd-connect_cas_ldap_certs
+ARG	CAS_LDAP_CERTS_FILE=/tmp/cas-ldap-certs.tar
 ENV	LOCAL_CAS_LDAP_CERTS_DIR=/tmp/rd-connect_cas_ldap_certs
 
 # EPEL is needed for apg program (a password generator)
@@ -22,9 +22,9 @@ RUN	curl -o /tmp/openldap-centos.patch 'https://bugs.centos.org/file_download.ph
 # This is needed, in order to get next steps working
 RUN	systemctl enable slapd
 # We fetch this, as it contains the LDAP setup script and schemas
-COPY	"${CAS_LDAP_CERTS_DIR}" "${LOCAL_CAS_LDAP_CERTS_DIR}"
+ADD	"${CAS_LDAP_CERTS_FILE}" "${LOCAL_CAS_LDAP_CERTS_DIR}"
 RUN	git clone -b "${CASBRANCH}" https://github.com/inab/ldap-rest-cas4-overlay.git "${CASCLONE}" && \
-	/bin/bash -x "${CASCLONE}/ldap-schemas/setup-ldap.sh" "${LOCAL_CAS_LDAP_CERTS_DIR}" "/usr/sbin/slapd -u ldap -h 'ldapi:/// ldap:///'" "pkill slapd ; sleep 5" && \
+	/bin/bash -x "${CASCLONE}/ldap-schemas/setup-ldap.sh" "${LOCAL_CAS_LDAP_CERTS_DIR}" "/usr/sbin/slapd -u ldap -h 'ldapi:/// ldap:///'" 'pkill slapd ; while pgrep slapd >& /dev/null ; do sleep 1 ; done' && \
 	rm -rf "${CASCLONE}" "${LOCAL_CAS_LDAP_CERTS_DIR}"
 
 # Last, cleanup!!

@@ -22,10 +22,10 @@ Steps to create the containers
 3. Build RD-Connect OpenLDAP container, along with its images (to be used by CAS):
 
 	```bash
-	CAS_LDAP_CERTS_DIR=/tmp/rd-connect_cas_ldap_certs
-	docker run --volumes-from rd-connect_ca-store -v "${CAS_LDAP_CERTS_DIR}":/tmp/rd-connect_certs rd-connect.eu/rd-connect_ca cas-ldap
 	CAS_TAG=cas-4.1.x
-	mkdir -p "${PWD}/openldap_rd-connect/tmp"
-	cp -dpr "${CAS_LDAP_CERTS_DIR}" "${PWD}/openldap_rd-connect/tmp"
-	docker build --build-arg="CAS_LDAP_CERTS_DIR=${CAS_LDAP_CERTS_DIR}" --build-arg="CASBRANCH=${CAS_TAG}" -t rd-connect.eu/cas-ldap:${CAS_TAG} openldap_rd-connect
+	mkdir -p "${PWD}"/openldap_rd-connect/tmp
+	CAS_LDAP_CERTS_FILE=/tmp/cas-ldap-certs.tar
+	docker run --volumes-from rd-connect_ca-store rd-connect.eu/rd-connect_ca cas-ldap > "${PWD}"/openldap_rd-connect/"${CAS_LDAP_CERTS_FILE}"
+	docker build --build-arg="CAS_LDAP_CERTS_FILE=${CAS_LDAP_CERTS_DIR}" --build-arg="CASBRANCH=${CAS_TAG}" -t rd-connect.eu/cas-ldap:${CAS_TAG} openldap_rd-connect
+	rm -f "${PWD}"/openldap_rd-connect/tmp
 	```

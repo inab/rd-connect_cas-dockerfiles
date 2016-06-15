@@ -19,6 +19,6 @@ Steps to create the common key generator container
 3. If you have to generate and get the certificates for another container (in the example, store in the directory `customdirectory` the certificates needed for `cas-ldap`), the commands are:
 
 	```bash
-	docker run --volumes-from rd-connect_ca-store -v customdirectory:/tmp/rd-connect_certs rd-connect.eu/rd-connect_ca cas-ldap
+	docker run --volumes-from rd-connect_ca-store rd-connect.eu/rd-connect_ca cas-ldap > cas-ldap-certs.tar
 	
 	```
