@@ -12,7 +12,7 @@ ENV	LOCAL_CAS_LDAP_CERTS_DIR=/tmp/rd-connect_cas_ldap_certs
 # EPEL is needed for apg program (a password generator)
 RUN	yum install -y openldap-servers openldap-clients epel-release git patch
 # so it must be installed afterwards
-RUN	yum install -y apg
+RUN	yum install -y apg gnutls-utils
 RUN	cp /usr/share/openldap-servers/DB_CONFIG.example /var/lib/ldap/DB_CONFIG
 RUN	chown ldap. /var/lib/ldap/DB_CONFIG
 RUN	curl -o /tmp/openldap-centos.patch 'https://bugs.centos.org/file_download.php?file_id=3559&type=bug' && \
@@ -20,7 +20,8 @@ RUN	curl -o /tmp/openldap-centos.patch 'https://bugs.centos.org/file_download.ph
 	patch -d / -p 0 -N -t < /tmp/openldap-centos.patch || true ) && \
 	rm -f /tmp/openldap-centos.patch
 # This is needed, in order to get next steps working
-RUN	systemctl enable slapd
+RUN	cd /root/blfs-bootscripts && make install-slapd
+RUN	echo '#!/bin/sh' > /etc/my_runalways/scripts && echo '/etc/init.d/slapd start' >> /etc/my_runalways/scripts && chmod +x /etc/my_runalways/scripts
 # We fetch this, as it contains the LDAP setup script and schemas
 ADD	"${CAS_LDAP_CERTS_FILE}" "${LOCAL_CAS_LDAP_CERTS_DIR}"
 RUN	git clone -b "${CASBRANCH}" https://github.com/inab/ldap-rest-cas4-overlay.git "${CASCLONE}" && \
@@ -32,5 +33,4 @@ RUN	yum autoremove -y git patch
 RUN	yum clean all
 
 EXPOSE	389 636
-VOLUME	[ "/etc/openldap", "/var/lib/ldap" ]
-CMD	[ "/usr/sbin/init" ]
+VOLUME	[ "/etc/openldap", "/var/lib/ldap", "/var/log" ]
