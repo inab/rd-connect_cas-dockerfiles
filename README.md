@@ -26,6 +26,6 @@ Steps to create the containers
 	mkdir -p "${PWD}"/openldap_rd-connect/tmp
 	CAS_LDAP_CERTS_FILE=/tmp/cas-ldap-certs.tar
 	docker run --volumes-from rd-connect_ca-store rd-connect.eu/rd-connect_ca cas-ldap > "${PWD}"/openldap_rd-connect/"${CAS_LDAP_CERTS_FILE}"
-	docker build --build-arg="CAS_LDAP_CERTS_FILE=${CAS_LDAP_CERTS_DIR}" --build-arg="CASBRANCH=${CAS_TAG}" -t rd-connect.eu/cas-ldap:${CAS_TAG} openldap_rd-connect
+	docker build --build-arg="CAS_LDAP_CERTS_FILE=${CAS_LDAP_CERTS_FILE}" --build-arg="CASBRANCH=${CAS_TAG}" -t rd-connect.eu/cas-ldap:${CAS_TAG} openldap_rd-connect
 	rm -f "${PWD}"/openldap_rd-connect/tmp
 	```

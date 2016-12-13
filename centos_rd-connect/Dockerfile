@@ -10,7 +10,7 @@ RUN	rm -f /etc/localtime && \
 
 # As we are inheriting from nimmis init system, which could be outdated, we update the system packages first
 RUN	yum -y update || true
-RUN	yum -y install bzip2 make
+RUN	yum -y install bzip2 make sysvinit-tools
 ENV	container docker
 
 ARG	LFS_BOOTSCRIPTS_VERSION=20150222
