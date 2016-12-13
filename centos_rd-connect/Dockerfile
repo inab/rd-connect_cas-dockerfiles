@@ -1,4 +1,4 @@
-FROM	centos:7
+FROM	nimmis/centos:7
 MAINTAINER	José María Fernández <jmfernandez@cnio.es>
 
 # Use a single LABEL (multiple ones are discouraged because each one creates a new layer)
@@ -8,15 +8,16 @@ LABEL	Description="Common layout for different RD-Connect CentOS based images" V
 RUN	rm -f /etc/localtime && \
 	ln -s ../usr/share/zoneinfo/Europe/Madrid /etc/localtime
 
-# Second, enable systemd (based on https://hub.docker.com/_/centos/)
+# As we are inheriting from nimmis init system, which could be outdated, we update the system packages first
+RUN	yum -y update || true
+RUN	yum -y install bzip2 make
 ENV	container docker
-RUN	(cd /lib/systemd/system/sysinit.target.wants/; for i in *; do [ $i == systemd-tmpfiles-setup.service ] || rm -f $i; done) && \
-	rm -f /lib/systemd/system/multi-user.target.wants/* && \
-	rm -f /etc/systemd/system/*.wants/* && \
-	rm -f /lib/systemd/system/local-fs.target.wants/* && \
-	rm -f /lib/systemd/system/sockets.target.wants/*udev* && \
-	rm -f /lib/systemd/system/sockets.target.wants/*initctl* && \
-	rm -f /lib/systemd/system/basic.target.wants/* && \
-	rm -f /lib/systemd/system/anaconda.target.wants/*
-VOLUME	[ "/sys/fs/cgroup" , "/var/log" ]
-CMD	[ "/usr/sbin/init" ]
+
+ARG	LFS_BOOTSCRIPTS_VERSION=20150222
+ARG	LFS_BOOTSCRIPTS_URL=http://www.linuxfromscratch.org/lfs/downloads/stable/lfs-bootscripts-${LFS_BOOTSCRIPTS_VERSION}.tar.bz2
+ARG	BLFS_BOOTSCRIPTS_VERSION=20160902
+ARG	BLFS_BOOTSCRIPTS_URL=http://anduin.linuxfromscratch.org/BLFS/blfs-bootscripts/blfs-bootscripts-${BLFS_BOOTSCRIPTS_VERSION}.tar.xz
+RUN	cd /tmp && wget "${LFS_BOOTSCRIPTS_URL}" && tar xf $(basename "${LFS_BOOTSCRIPTS_URL}") && cd "lfs-bootscripts-${LFS_BOOTSCRIPTS_VERSION}" && make install && chmod -x /etc/init.d/*
+RUN	cd /root && wget "${BLFS_BOOTSCRIPTS_URL}" && tar xf $(basename "${BLFS_BOOTSCRIPTS_URL}")
+
+#CMD	[ "/usr/sbin/init" ]
