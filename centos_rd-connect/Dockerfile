@@ -19,5 +19,6 @@ ARG	BLFS_BOOTSCRIPTS_VERSION=20160902
 ARG	BLFS_BOOTSCRIPTS_URL=http://anduin.linuxfromscratch.org/BLFS/blfs-bootscripts/blfs-bootscripts-${BLFS_BOOTSCRIPTS_VERSION}.tar.xz
 RUN	cd /tmp && wget "${LFS_BOOTSCRIPTS_URL}" && tar xf $(basename "${LFS_BOOTSCRIPTS_URL}") && cd "lfs-bootscripts-${LFS_BOOTSCRIPTS_VERSION}" && make install && chmod -x /etc/init.d/*
 RUN	cd /root && wget "${BLFS_BOOTSCRIPTS_URL}" && tar xf $(basename "${BLFS_BOOTSCRIPTS_URL}") && ln -s blfs-bootscripts-${BLFS_BOOTSCRIPTS_VERSION} blfs-bootscripts
+ADD	my_initd_service /
 
 #CMD	[ "/usr/sbin/init" ]
