@@ -1,10 +1,10 @@
-FROM	rd-connect.eu/centos:7
+FROM	rd-connect.eu/openjdk:7
 MAINTAINER	José María Fernández <jmfernandez@cnio.es>
 
 # Use a single LABEL (multiple ones are discouraged because each one creates a new layer)
 LABEL	Description="Tomcat 7 layout for different RD-Connect CentOS based images" Vendor="CNIO" Version="7.0."
 
-ARG	TOMCAT_TAG=7.0.69
+ARG	TOMCAT_TAG=7.0.73
 ENV	TOMCATCLONE=/tmp/tomcat-${TOMCAT_TAG}
 
 # Now, the steps needed to install RD-Connect CAS and CAS-Management
@@ -27,5 +27,7 @@ RUN	rm -rf "${TOMCATCLONE}"
 RUN	yum autoremove -y rpmdevtools
 RUN	yum clean all
 
-VOLUME	[ "/etc/tomcat7", "/var/lib/tomcat7" ]
-CMD	[ "/usr/sbin/init" ]
+# And with this, tomcat is initialized on container startup
+RUN	echo '[program:tomcat7]' > /etc/supervisord.d/tomcat7.conf && echo 'command=/my_initd_service tomcat7' >> /etc/supervisord.d/tomcat7.conf
+
+VOLUME	[ "/etc/tomcat7", "/var/lib/tomcat7", "/var/log/tomcat7" ]
