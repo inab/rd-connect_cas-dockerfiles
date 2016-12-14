@@ -11,7 +11,7 @@ ENV	LOCAL_CAS_LDAP_CERTS_DIR=/tmp/rd-connect_cas_ldap_certs
 
 # This must be done BEFORE, so /etc/sysconfig/slapd file from CentOS is not overwritten
 RUN	cd /root/blfs-bootscripts && make install-slapd && rm -f /etc/sysconfig/slapd && sed -i 's#SLAPD_SERVICES#SLAPD_URLS#g' /etc/init.d/slapd
-RUN	echo '[program:slapd]' > /etc/supervisord.d/slapd.conf && echo 'command=/my_service slapd' >> /etc/supervisord.d/slapd.conf
+RUN	echo '[program:slapd]' > /etc/supervisord.d/slapd.conf && echo 'command=/my_initd_service slapd' >> /etc/supervisord.d/slapd.conf
 # EPEL is needed for apg program (a password generator)
 RUN	yum install -y openldap-servers openldap-clients epel-release git patch
 # so it must be installed afterwards
