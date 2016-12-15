@@ -35,3 +35,10 @@ Steps to create the containers
 	docker build --build-arg="CAS_LDAP_CERTS_FILE=${CAS_LDAP_CERTS_FILE}" --build-arg="CASBRANCH=${CAS_TAG}" -t rd-connect.eu/cas-ldap:${CAS_TAG} openldap_rd-connect
 	rm -f "${PWD}"/openldap_rd-connect/tmp
 	```
+
+3. Build CentOS Apache Web server container (for instance, 2.4.6), tagging it locally:
+
+	```bash
+	HTTPD_TAG=latest
+	docker build -t rd-connect.eu/httpd:${HTTPD_TAG} httpd_rd-connect
+	```
