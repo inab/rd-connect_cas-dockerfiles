@@ -37,23 +37,35 @@ Steps to create the containers
 	```
 
 3. Steps to create the containers for Web User Management Interface Application.
-	First of all we generate the umi_data_container based on centos:7 oficial image:
+	1. First of all we generate the umi_data_container based on centos:7 oficial image:
 	
 	```bash
-	$ docker create -v /var/log/httpd /etc/httpd --name umi_data_container centos:7 /bin/true
+	$ docker create -v /var/log/httpd -v /etc/httpd --name umi_data_container centos:7 /bin/true
 	```
 	
-	Now we build CentOS Apache Web server image (for instance, 2.4.6), tagging it locally and based on httpd_rd-connect:
+	2. Now we build CentOS Apache Web server image, tagging it locally and based on httpd_rd-connect:
 
 	```bash
-	HTTPD_TAG=latest
+	HTTPD_TAG=2.4
 	docker build -t rd-connect.eu/httpd:${HTTPD_TAG} httpd_rd-connect
 	```
 	
-	Now we run rd-connect.eu/httpd based on rd-connect.eu/httpd:${HTTPD_TAG} image, giving it a name of rd-connect.eu_httpd and mounting volumes exported by umi_data_container
+	3. We augment it with phpldapadmin:
+	
 	```bash
-	docker run -d --volumes-from umi_data_container --name rd-connect.eu_httpd rd-connect.eu/httpd:${HTTPD_TAG}
+	PLA_TAG=latest
+	docker build -t rd-connect.eu/phpldapadmin:${PLA_TAG} phpldapadmin_rd-connect
 	```
 	
-	Now we build rd-connect.eu/umi the image that will create container to deploy user management interface
+	4. Now we build rd-connect.eu/umi the image that will create container to deploy user management interface
 	
+	```bash
+	UMI_TAG=latest
+	docker build -t rd-connect.eu/umi:${UMI_TAG} umi_rd-connect
+	```
+	
+	5. Last, we run rd-connect.eu/umi based on rd-connect.eu/umi:${UMI_TAG} image, giving it a name of `rd-connect.eu_umi` and mounting volumes exported by `umi_data_container`
+	
+	```bash
+	docker run -d --volumes-from umi_data_container --name rd-connect.eu_umi rd-connect.eu/umi:${UMI_TAG}
+	```
