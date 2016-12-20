@@ -6,7 +6,6 @@ LABEL	Description="RD-Connect User Management Interface" Vendor="CNIO"
 #mkdir -p "${PWD}"/umi_rd-connect/tmp
 
 
-ENV NODE_ENV=production
 ENV NODE_VERSION=4.7.0
 ARG UMIBRANCH=latest
 
@@ -35,43 +34,47 @@ USER	rdconnect-rest
 ENV	HOME=/home/rdconnect-rest
 WORKDIR	${HOME}
 
-ARG	USERMANAGEMENT_CHECKOUT=44422b6e420bfa2d59581cce945a4f40bdb27e7c
+ARG	USERMANAGEMENT_CHECKOUT=1c87c4288100a2b97c7bb0a981ab85ae25054342
 RUN	git clone https://github.com/inab/rd-connect-user-management.git && \
 	cd rd-connect-user-management && \
 	git checkout "$USERMANAGEMENT_CHECKOUT"
 RUN	cd rd-connect-user-management && ./install-deps.sh
 RUN	mkdir -p RDConnect-UserManagement-REST-API
-RUN	cp -dpr user-management.ini user-management.cgi user-management.fcgi user-management.psgi libs "$HOME"/RDConnect-UserManagement-REST-API
+RUN	cd rd-connect-user-management && cp -dpr user-management.cgi user-management.fcgi user-management.psgi libs "$HOME"/RDConnect-UserManagement-REST-API
+RUN	cd rd-connect-user-management && cp -dp template-config.ini "$HOME"/RDConnect-UserManagement-REST-API/user-management.ini 
 
 ENV	UMI_CLONE=${HOME}/user-management-interface
 WORKDIR ${UMI_CLONE}
 
-RUN	git clone https://github.com/inab/rd-connect-user-management-interface.git $UMI_CLONE
+ARG	UMI_CHECKOUT=82abdce80694f0c5694dc335cb6fb08fb29ec4ac
+RUN	git clone https://github.com/inab/rd-connect-user-management-interface.git "${UMI_CLONE}" && \
+	cd "${UMI_CLONE}" && \
+	git checkout "${UMI_CHECKOUT}"
 RUN	npm install
-RUN	PATH="$PWD/node_modules/.bin:$PATH" gulp build
+RUN	PATH="${UMI_CLONE}/node_modules/.bin:$PATH" gulp build
 RUN	mkdir -p "$HOME/DOCUMENT_ROOT" && cp -dpTr build "$HOME/DOCUMENT_ROOT/user-management"
 
 # The SELinux part
-RUN	chmod go+rx "$HOME" && \
-	chcon -Rv --type=httpd_sys_content_t "$HOME"/DOCUMENT_ROOT && \
-	chcon -Rv --type=httpd_sys_content_t "$HOME"/rd-connect-user-management && \
-	chcon -Rv --type=httpd_sys_content_t "$HOME"/RDConnect-UserManagement-REST-API && \
-	chcon -Rv --type=httpd_sys_script_exec_t "$HOME"/RDConnect-UserManagement-REST-API/user-management.cgi
+#RUN	chmod go+rx "$HOME" && \
+#	chcon -Rv --type=httpd_sys_content_t "$HOME"/DOCUMENT_ROOT && \
+#	chcon -Rv --type=httpd_sys_content_t "$HOME"/rd-connect-user-management && \
+#	chcon -Rv --type=httpd_sys_content_t "$HOME"/RDConnect-UserManagement-REST-API && \
+#	chcon -Rv --type=httpd_sys_script_exec_t "$HOME"/RDConnect-UserManagement-REST-API/user-management.cgi
 
 USER	root
 ENV	HOME=/root
 WORKDIR	${HOME}
 
 RUN	yum --enablerepo=epel install -y httpd-itk
-RUN	yum install -y checkpolicy policycoreutils-python && \
-	setsebool -P httpd_enable_cgi=1 && \
-	setsebool -P httpd_read_user_content=1 && \
-	setsebool -P httpd_can_network_connect=1 && \
-	setsebool -P httpd_enable_homedirs=1 && \
-	cd /tmp && \
-	checkmodule -M -m -o rdconnect-user-management.mod /home/rdconnect-rest/rd-connect-user-management/selinux/rdconnect-user-management.te && \
-	semodule_package -o rdconnect-user-management.pp -m rdconnect-user-management.mod && \
-	semodule -i rdconnect-user-management.pp
+#RUN	yum install -y checkpolicy policycoreutils-python && \
+#	setsebool -P httpd_enable_cgi=1 && \
+#	setsebool -P httpd_read_user_content=1 && \
+#	setsebool -P httpd_can_network_connect=1 && \
+#	setsebool -P httpd_enable_homedirs=1 && \
+#	cd /tmp && \
+#	checkmodule -M -m -o rdconnect-user-management.mod /home/rdconnect-rest/rd-connect-user-management/selinux/rdconnect-user-management.te && \
+#	semodule_package -o rdconnect-user-management.pp -m rdconnect-user-management.mod && \
+#	semodule -i rdconnect-user-management.pp
 RUN	sed -i 's/^#\(LoadModule \)/\1/' /etc/httpd/conf.modules.d/00-mpm-itk.conf
 
 # Cleaning up
@@ -79,4 +82,5 @@ RUN	yum autoremove -y git
 RUN	yum clean all
 
 EXPOSE 80 443
-VOLUME	[ "/var/log/httpd", "/etc/httpd", "/home/rdconnect-rest/RDConnect-UserManagement-REST-API/user-management.ini" ]
+#VOLUME	[ "/var/log/httpd", "/etc/httpd", "/home/rdconnect-rest/RDConnect-UserManagement-REST-API/user-management.ini" ]
+VOLUME	[ "/var/log/httpd", "/etc/httpd" ]

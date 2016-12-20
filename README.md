@@ -40,7 +40,8 @@ Steps to create the containers
 	1. First of all we generate the umi_data_container based on centos:7 oficial image:
 	
 	```bash
-	$ docker create -v /var/log/httpd -v /etc/httpd --name umi_data_container centos:7 /bin/true
+	docker create -v /var/log/httpd -v /etc/httpd --name umi_data_container centos:7 /bin/true
+	docker cp blblblblblb umi_data_container:/etc/
 	```
 	
 	2. Now we build CentOS Apache Web server image, tagging it locally and based on httpd_rd-connect:
