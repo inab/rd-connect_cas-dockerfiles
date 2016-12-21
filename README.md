@@ -43,9 +43,9 @@ Steps to create the containers
 	CAS_TAG=cas-4.1.x
 	mkdir -p "${PWD}"/openldap_rd-connect/tmp
 	CAS_LDAP_CERTS_FILE=/tmp/cas-ldap-certs.tar
-	docker run --volumes-from ca_data_container rd-connect.eu/rd-connect_ca cas-ldap > "${PWD}"/openldap_rd-connect/"${CAS_LDAP_CERTS_FILE}"
+	docker run --volumes-from ca_data_container rd-connect.eu/ca_data_container cas-ldap > "${PWD}"/openldap_rd-connect/"${CAS_LDAP_CERTS_FILE}"
 	docker build --build-arg="CAS_LDAP_CERTS_FILE=${CAS_LDAP_CERTS_FILE}" --build-arg="CASBRANCH=${CAS_TAG}" -t rd-connect.eu/cas-ldap:${CAS_TAG} openldap_rd-connect
-	rm -f "${PWD}"/openldap_rd-connect/tmp
+	rm -fr "${PWD}"/openldap_rd-connect/tmp
 	```
 
 5. Steps to create the containers for Web User Management Interface Application.
