@@ -16,4 +16,4 @@ RUN	yum update -y --setopt=tsflags=nodocs && \
 	sed -i  "s#\$servers->setValue('server','tls',false)#\$servers->setValue('server','tls',true)#g" /etc/phpldapadmin/config.php && \
 	sed -i  "s#\$servers->setValue('login','attr','uid')#\/\/ \$servers->setValue('login','attr','uid')#g" /etc/phpldapadmin/config.php
 
-VOLUME	[ '/etc/phpldapadmin' ]
+VOLUME	[ "/etc/phpldapadmin" ]

@@ -13,6 +13,6 @@ RUN	yum -y --setopt=tsflags=nodocs update && \
 #RUN sed -i 's#UserDir disabled#\#UserDir disabled#g' /etc/httpd/conf.d/userdir.conf && \
 #	sed -i 's#\#UserDir public_html#UserDir public_html#g' /etc/httpd/conf.d/userdir.conf
 
-VOLUME	[ '/etc/httpd', '/var/log/httpd' ]
+VOLUME	[ "/etc/httpd", "/var/log/httpd" ]
 
 EXPOSE	80
