@@ -17,8 +17,12 @@ Steps to create the containers
 	```bash
 	docker build -t rd-connect.eu/openjdk:7 openjdk_rd-connect
 	```
-
-3. Build CentOS Tomcat container (for instance, 7.0.73), tagging it locally:
+3. We generate the cas_data_container based on centos:7 oficial image:
+	
+	```bash
+	docker create -v /var/log -v /etc/tomcat -v /etc/tomcat7 -v /var/lib/tomcat7 -v /var/log/tomcat7 --name cas_data_container centos:7 /bin/true
+	```
+4. Build CentOS Tomcat container (for instance, 7.0.73), tagging it locally:
 
 	```bash
 	TOMCAT_TAG=7.0.73
@@ -27,20 +31,28 @@ Steps to create the containers
 
 4. Build RD-Connect OpenLDAP container, along with its images (to be used by CAS):
 
+	2. We generate the ldap_data_container based on centos:7 oficial image:
+	
+	```bash
+	docker create -v /etc/openldap -v /var/lib/ldap -v /var/log --name ldap_data_container centos:7 /bin/true
+	```
+	
+	3. Build RD-Connect OpenLDAP container
+	
 	```bash
 	CAS_TAG=cas-4.1.x
 	mkdir -p "${PWD}"/openldap_rd-connect/tmp
 	CAS_LDAP_CERTS_FILE=/tmp/cas-ldap-certs.tar
-	docker run --volumes-from rd-connect_ca-store rd-connect.eu/rd-connect_ca cas-ldap > "${PWD}"/openldap_rd-connect/"${CAS_LDAP_CERTS_FILE}"
+	docker run --volumes-from ca_data_container rd-connect.eu/rd-connect_ca cas-ldap > "${PWD}"/openldap_rd-connect/"${CAS_LDAP_CERTS_FILE}"
 	docker build --build-arg="CAS_LDAP_CERTS_FILE=${CAS_LDAP_CERTS_FILE}" --build-arg="CASBRANCH=${CAS_TAG}" -t rd-connect.eu/cas-ldap:${CAS_TAG} openldap_rd-connect
 	rm -f "${PWD}"/openldap_rd-connect/tmp
 	```
 
 5. Steps to create the containers for Web User Management Interface Application.
-	1. First of all we generate the umi_data_container based on centos:7 oficial image:
+	1. We generate the umi_data_container based on centos:7 oficial image:
 	
 	```bash
-	docker create -v /var/log/httpd -v /etc/httpd -v /etc/openldap --name umi_data_container centos:7 /bin/true
+	docker create -v /var/log/httpd -v /etc/httpd -v /etc/openldap -v /etc/phpldapadmin --name umi_data_container centos:7 /bin/true
 	docker cp blblblblblb umi_data_container:/etc/
 	```
 	
