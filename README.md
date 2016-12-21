@@ -36,11 +36,11 @@ Steps to create the containers
 	rm -f "${PWD}"/openldap_rd-connect/tmp
 	```
 
-3. Steps to create the containers for Web User Management Interface Application.
+5. Steps to create the containers for Web User Management Interface Application.
 	1. First of all we generate the umi_data_container based on centos:7 oficial image:
 	
 	```bash
-	docker create -v /var/log/httpd -v /etc/httpd --name umi_data_container centos:7 /bin/true
+	docker create -v /var/log/httpd -v /etc/httpd -v /etc/openldap --name umi_data_container centos:7 /bin/true
 	docker cp blblblblblb umi_data_container:/etc/
 	```
 	
