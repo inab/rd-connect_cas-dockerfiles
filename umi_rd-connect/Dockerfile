@@ -34,14 +34,13 @@ USER	rdconnect-rest
 ENV	HOME=/home/rdconnect-rest
 WORKDIR	${HOME}
 
-ARG	USERMANAGEMENT_CHECKOUT=1c87c4288100a2b97c7bb0a981ab85ae25054342
+ARG	USERMANAGEMENT_CHECKOUT=e615e07d218f6d3f6e47962668a7d16ba245ee61
 RUN	git clone https://github.com/inab/rd-connect-user-management.git && \
 	cd rd-connect-user-management && \
 	git checkout "$USERMANAGEMENT_CHECKOUT"
 RUN	cd rd-connect-user-management && ./install-deps.sh
 RUN	mkdir -p RDConnect-UserManagement-REST-API
-RUN	cd rd-connect-user-management && cp -dpr user-management.cgi user-management.fcgi user-management.psgi libs "$HOME"/RDConnect-UserManagement-REST-API
-RUN	cd rd-connect-user-management && cp -dp template-config.ini "$HOME"/RDConnect-UserManagement-REST-API/user-management.ini 
+RUN	cd rd-connect-user-management && cp -dpr configs user-management.cgi user-management.fcgi user-management.psgi libs "$HOME"/RDConnect-UserManagement-REST-API
 
 ENV	UMI_CLONE=${HOME}/user-management-interface
 WORKDIR ${UMI_CLONE}
@@ -82,5 +81,4 @@ RUN	yum autoremove -y git
 RUN	yum clean all
 
 EXPOSE 80 443
-#VOLUME	[ "/var/log/httpd", "/etc/httpd", "/home/rdconnect-rest/RDConnect-UserManagement-REST-API/user-management.ini" ]
-VOLUME	[ "/var/log/httpd", "/etc/httpd" ]
+VOLUME	[ "/var/log/httpd", "/etc/httpd" , "/home/rdconnect-rest/RDConnect-UserManagement-REST-API/configs"]
