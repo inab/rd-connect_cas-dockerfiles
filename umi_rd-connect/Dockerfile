@@ -75,10 +75,15 @@ RUN	yum --enablerepo=epel install -y httpd-itk
 #	semodule_package -o rdconnect-user-management.pp -m rdconnect-user-management.mod && \
 #	semodule -i rdconnect-user-management.pp
 RUN	sed -i 's/^#\(LoadModule \)/\1/' /etc/httpd/conf.modules.d/00-mpm-itk.conf
+COPY	umi.conf /tmp
+RUN	sed -e '/<\/VirtualHost>/r /tmp/umi.conf' -e 'x;$G' -i /etc/httpd/conf.d/ssl.conf && rm /tmp/umi.conf
+
+# Enabling the API as such
+
 
 # Cleaning up
 RUN	yum autoremove -y git
 RUN	yum clean all
 
 EXPOSE 80 443
-VOLUME	[ "/var/log/httpd", "/etc/httpd" , "/home/rdconnect-rest/RDConnect-UserManagement-REST-API/configs"]
+VOLUME	[ "/var/log/httpd", "/home/rdconnect-rest/RDConnect-UserManagement-REST-API/configs"]
