@@ -1,4 +1,4 @@
-FROM	centos:7
+FROM	rd-connect.eu/centos:7
 MAINTAINER	José María Fernández <jmfernandez@cnio.es>
 
 # Use a single LABEL (multiple ones are discouraged because each one creates a new layer)
@@ -9,9 +9,6 @@ ENV	RDCONNECT_CASOFT_DIR_REL=rd-connect_ca
 ENV	RDCONNECT_CASOFT_DIR=/usr/local/${RDCONNECT_CASOFT_DIR_REL}
 ENV	RDCONNECT_CERTS_OUT_DIR=/tmp/rd-connect_certs
 # Now, the steps needed to install certtool
-# First, setup the timezone
-RUN	rm -f /etc/localtime && \
-	ln -s ../usr/share/zoneinfo/Europe/Madrid /etc/localtime
 # We need these utilities for the packaged script
 RUN	yum install -y gnutls-utils
 # Last, cleanup!

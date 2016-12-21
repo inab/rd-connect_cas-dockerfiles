@@ -10,15 +10,21 @@ Steps to create the common key generator container
 	docker create -v /etc/rd-connect_keystore --name rd-connect_ca-store centos:7 /bin/true
 	```
 
-2. Build container, tagging it locally:
+2. Build CentOS common container, tagging it locally:
 
 	```bash
-	docker build -t rd-connect.eu/rd-connect_ca:0.1 -t rd-connect.eu/rd-connect_ca:latest rd-connect-common-key-generator
+	docker build -t rd-connect.eu/centos:7 centos_rd-connect
 	```
 
-3. If you have to generate and get the certificates for another container (in the example, store in the directory `customdirectory` the certificates needed for `cas-ldap`), the commands are:
+3. Build common key generator container, tagging it locally:
 
 	```bash
-	docker run --volumes-from rd-connect_ca-store rd-connect.eu/rd-connect_ca cas-ldap > cas-ldap-certs.tar
+	docker build -t rd-connect.eu/ca_data_container:0.1 -t rd-connect.eu/ca_data_container:latest rd-connect-common-key-generator
+	```
+
+4. If you have to generate and get the certificates for another container (in the example, store in the directory `customdirectory` the certificates needed for `cas-ldap`), the commands are:
+
+	```bash
+	docker run --volumes-from rd-connect_ca-store rd-connect.eu/ca_data_container cas-ldap > cas-ldap-certs.tar
 	
 	```
