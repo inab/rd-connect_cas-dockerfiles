@@ -30,4 +30,4 @@ RUN	yum clean all
 # And with this, tomcat is initialized on container startup
 RUN	echo '[program:tomcat7]' > /etc/supervisord.d/tomcat7.conf && echo 'command=/my_initd_service tomcat7' >> /etc/supervisord.d/tomcat7.conf
 
-VOLUME	[ "/etc/tomcat7", "/var/lib/tomcat7", "/var/log/tomcat7" ]
+VOLUME	[ "/var/log/tomcat7" ]
