@@ -7,7 +7,7 @@ Steps to create the common key generator container
 1. Create data container, which will hold the storage:
 
 	```bash
-	docker create -v /etc/rd-connect_keystore --name rd-connect_ca-store centos:7 /bin/true
+	docker create -v /etc/rd-connect_keystore --name ca_data_container centos:7 /bin/true
 	```
 
 2. Build container, tagging it locally:
