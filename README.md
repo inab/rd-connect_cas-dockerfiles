@@ -52,7 +52,7 @@ Steps to create the containers
 	1. We generate the umi_data_container based on centos:7 oficial image:
 	
 	```bash
-	docker create -v /var/log/httpd -v /etc/httpd -v /etc/openldap -v /etc/phpldapadmin --name umi_data_container centos:7 /bin/true
+	docker create -v /var/log/httpd -v /etc/openldap -v /etc/phpldapadmin --name umi_data_container centos:7 /bin/true
 	docker cp blblblblblb umi_data_container:/etc/
 	```
 	
