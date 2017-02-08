@@ -46,6 +46,8 @@ if [ $# -gt 0 ]; then
 			echo "[ERROR] Template for certificate '${cert}' does not exist at '${certtemplate}'"
 			exit 1
 		fi
+		dnsName="$(grep ^dns_name "${certtemplate}" | tr -d ' '| cut -f 2 -d '=')"
+		
 		certdir="${keysDir}/${cert}"
 		if [ ! -f "${certdir}"/cert.pem ] ; then
 			mkdir -p "${certdir}"
@@ -60,11 +62,13 @@ if [ $# -gt 0 ]; then
 				--outfile "${certdir}"/cert.pem \
 				--load-ca-certificate "${CAcert}" \
 				--load-ca-privkey "${CAkey}"
-			
+		fi
+		
+		if [ ! -f "${certdir}"/keystore.p12 ] ; then
 			# Last, generate a p12 keystore, which can be imported into a Java keystore
 			certtool --load-ca-certificate "${CAcert}" \
 				--load-certificate "${certdir}"/cert.pem --load-privkey "${certdir}"/key.pem \
-				--to-p12 --p12-name="${cert}" --password="${cert}" --outder --outfile "${certdir}"/keystore.p12
+				--to-p12 --p12-name="${dnsName}" --password="${cert}" --outder --outfile "${certdir}"/keystore.p12
 		fi
 		echo "Adding RD-Connect '${cert}' keys"
 		#cp --no-preserve=mode,ownership --preserve=timestamps -r "${certdir}" "${resDir}"
