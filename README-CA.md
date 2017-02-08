@@ -19,12 +19,12 @@ Steps to create the common key generator container
 3. Build common key generator container, tagging it locally:
 
 	```bash
-	docker build -t rd-connect.eu/ca_data_container:0.1 -t rd-connect.eu/ca_data_container:latest rd-connect-common-key-generator
+	docker build -t rd-connect.eu/ca_data_container:0.2 -t rd-connect.eu/ca_data_container:latest rd-connect-common-key-generator
 	```
 
-4. If you have to generate and get the certificates for another container (in the example, store in the directory `customdirectory` the certificates needed for `cas-ldap`), the commands are:
+4. If you have to generate and get several certificates (in the case of the example, cas-ldap and cas-tomcat profiles) for another container, the command is:
 
 	```bash
-	docker run --volumes-from rd-connect_ca-store rd-connect.eu/ca_data_container cas-ldap > cas-ldap-certs.tar
+	docker run --volumes-from rd-connect_ca-store rd-connect.eu/ca_data_container cas-ldap cas-tomcat > cas-certs.tar
 	
 	```
