@@ -40,6 +40,9 @@ echo "Adding RD-Connect public key"
 ln -s "${CAcert}" "${resDir}"
 
 if [ $# -gt 0 ]; then
+	# We want it to exit on first error
+	set -e
+	
 	for cert in "$@" ; do
 		certtemplate="${templatedir}/${cert}.cfg"
 		if [ ! -f "${certtemplate}" ] ; then
@@ -64,11 +67,16 @@ if [ $# -gt 0 ]; then
 				--load-ca-privkey "${CAkey}"
 		fi
 		
+		# Last, generate a p12 keystore, which can be imported into a Java keystore
 		if [ ! -f "${certdir}"/keystore.p12 ] ; then
-			# Last, generate a p12 keystore, which can be imported into a Java keystore
 			certtool --load-ca-certificate "${CAcert}" \
 				--load-certificate "${certdir}"/cert.pem --load-privkey "${certdir}"/key.pem \
 				--to-p12 --p12-name="${dnsName}" --password="${cert}" --outder --outfile "${certdir}"/keystore.p12
+		fi
+		if [ ! -f "${certdir}"/keystoreOpenSSL.p12 ] ; then
+			export cert
+			openssl pkcs12 -export -in "${certdir}"/cert.pem -inkey "${certdir}"/key.pem -name "${dnsName}" \
+				 -certfile "${CAcert}" -password env:cert -out "${certdir}"/keystoreOpenSSL.p12
 		fi
 		echo "Adding RD-Connect '${cert}' keys"
 		#cp --no-preserve=mode,ownership --preserve=timestamps -r "${certdir}" "${resDir}"
