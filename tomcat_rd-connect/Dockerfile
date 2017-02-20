@@ -17,8 +17,8 @@ RUN	yum install -y ~/rpmbuild/RPMS/noarch/*.rpm && \
 	rm -rf ~/rpmbuild
 # Now, creating a symlink from tomcat7 to tomcat in /etc and /usr/share
 # so next instructions are coherent
-RUN	ln -s /etc/tomcat7 /etc/tomcat && \
-	ln -s /usr/share/tomcat7 /usr/share/tomcat
+RUN	ln -s tomcat7 /etc/tomcat && \
+	ln -s tomcat7 /usr/share/tomcat
 
 # Cleaning up Tomcat build
 RUN	rm -rf "${TOMCATCLONE}"
