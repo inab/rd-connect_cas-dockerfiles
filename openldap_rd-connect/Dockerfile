@@ -4,8 +4,9 @@ MAINTAINER	José María Fernández <jmfernandez@cnio.es>
 # Use a single LABEL (multiple ones are discouraged because each one creates a new layer)
 LABEL	Description="RD-Connect OpenLDAP setup" Vendor="CNIO" Version="1.0"
 
-ARG	CASBRANCH=cas-4.1.x
-ENV	CASCLONE=/tmp/ldap-cas-${CASBRANCH}
+ARG	CAS_RELEASE=d97dbbea780daf1b998497bce32677b609d12f0c
+ENV	CASCLONE=/tmp/ldap-cas-${CAS_RELEASE}
+ARG	LDAP_CERTS_PROFILE=cas-ldap
 ARG	CAS_LDAP_CERTS_FILE=/tmp/cas-ldap-certs.tar
 ENV	LOCAL_CAS_LDAP_CERTS_DIR=/tmp/rd-connect_cas_ldap_certs
 
@@ -25,8 +26,10 @@ RUN	curl -o /tmp/openldap-centos.patch 'https://bugs.centos.org/file_download.ph
 # This is needed, in order to get next steps working
 # We fetch this, as it contains the LDAP setup script and schemas
 ADD	"${CAS_LDAP_CERTS_FILE}" "${LOCAL_CAS_LDAP_CERTS_DIR}"
-RUN	git clone -b "${CASBRANCH}" https://github.com/inab/ldap-rest-cas4-overlay.git "${CASCLONE}" && \
-	/bin/bash -x "${CASCLONE}/ldap-schemas/setup-ldap.sh" "${LOCAL_CAS_LDAP_CERTS_DIR}" "/etc/init.d/slapd start" '/etc/init.d/slapd stop' && \
+RUN	git clone https://github.com/inab/ldap-rest-cas4-overlay.git "${CASCLONE}" && \
+	cd "${CASCLONE}" && \
+	git checkout "${CAS_RELEASE}" && \
+	/bin/bash -x "${CASCLONE}/ldap-schemas/setup-ldap.sh" "${LOCAL_CAS_LDAP_CERTS_DIR}" "${LDAP_CERTS_PROFILE}" "/etc/init.d/slapd start" '/etc/init.d/slapd stop' && \
 	rm -rf "${CASCLONE}" "${LOCAL_CAS_LDAP_CERTS_DIR}"
 
 # Last, cleanup!!
