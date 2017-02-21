@@ -37,7 +37,7 @@ Steps to create the containers
 	docker build --build-arg="LDAP_CERTS_PROFILE=${LDAP_CERTS_PROFILE}" --build-arg="CAS_LDAP_CERTS_FILE=${CAS_LDAP_CERTS_FILE}" -t rd-connect.eu/cas-ldap:${CAS_TAG} openldap_rd-connect
 	rm -fr "${PWD}"/openldap_rd-connect/tmp
 	```
-4. Build RD-Connect CAS container (for instance, ), tagging it locally:
+4. Build RD-Connect CAS container, tagging it locally:
 	1. Generate the certificates bundle to be used by RD-Connect CAS Tomcat:
 	```bash
 	mkdir -p "${PWD}"/rd-connect-CAS-server/tmp
@@ -49,7 +49,7 @@ Steps to create the containers
 	2. Build the tomcat image, and generate the cas_tomcat_data_container based on centos:7 oficial image:
 	
 	```bash
-	TOMCAT_TAG=7.0.73
+	TOMCAT_TAG=7.0.75
 	docker build --build-arg="TOMCAT_TAG=${TOMCAT_TAG}" -t rd-connect.eu/tomcat:${TOMCAT_TAG} -t rd-connect.eu/tomcat:7 tomcat_rd-connect
 	docker create -v /var/log -v /etc/cas -v /etc/tomcat7 --name cas_tomcat_data_container centos:7 /bin/true
 	```
