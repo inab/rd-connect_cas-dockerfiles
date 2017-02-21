@@ -4,7 +4,7 @@ MAINTAINER	José María Fernández <jmfernandez@cnio.es>
 # Use a single LABEL (multiple ones are discouraged because each one creates a new layer)
 LABEL	Description="RD-Connect OpenLDAP setup" Vendor="CNIO" Version="1.0"
 
-ARG	CAS_RELEASE=d97dbbea780daf1b998497bce32677b609d12f0c
+ARG	CAS_RELEASE=6ebf2bc2ecfb1981ff50f0279080123d640f041e
 ENV	CASCLONE=/tmp/ldap-cas-${CAS_RELEASE}
 ARG	LDAP_CERTS_PROFILE=cas-ldap
 ARG	CAS_LDAP_CERTS_FILE=/tmp/cas-ldap-certs.tar
