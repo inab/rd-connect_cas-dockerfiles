@@ -14,11 +14,16 @@ RUN	yum -y install bzip2 make sysvinit-tools
 ENV	container docker
 
 ARG	LFS_BOOTSCRIPTS_VERSION=20150222
-ARG	LFS_BOOTSCRIPTS_URL=http://www.linuxfromscratch.org/lfs/downloads/stable/lfs-bootscripts-${LFS_BOOTSCRIPTS_VERSION}.tar.bz2
+ENV	LFS_BOOTSCRIPTS_REL=lfs-bootscripts-${LFS_BOOTSCRIPTS_VERSION}
+ENV	LFS_BOOTSCRIPTS_DIR=/tmp/${LFS_BOOTSCRIPTS_REL}
+ARG	LFS_BOOTSCRIPTS_URL=http://www.linuxfromscratch.org/lfs/downloads/stable/${LFS_BOOTSCRIPTS_REL}.tar.bz2
 ARG	BLFS_BOOTSCRIPTS_VERSION=20160902
 ARG	BLFS_BOOTSCRIPTS_URL=http://anduin.linuxfromscratch.org/BLFS/blfs-bootscripts/blfs-bootscripts-${BLFS_BOOTSCRIPTS_VERSION}.tar.xz
-RUN	cd /tmp && wget "${LFS_BOOTSCRIPTS_URL}" && tar xf $(basename "${LFS_BOOTSCRIPTS_URL}") && cd "lfs-bootscripts-${LFS_BOOTSCRIPTS_VERSION}" && make install && chmod -x /etc/init.d/*
+# First, LFS skeleton
+RUN	cd /tmp && wget "${LFS_BOOTSCRIPTS_URL}" && tar xf $(basename "${LFS_BOOTSCRIPTS_URL}") && cd "${LFS_BOOTSCRIPTS_DIR}" && make install && chmod -x /etc/init.d/* && cd /tmp && rm -rf "${LFS_BOOTSCRIPTS_DIR}" $(basename "${LFS_BOOTSCRIPTS_URL}")
+# Then, BLFS templates
 RUN	cd /root && wget "${BLFS_BOOTSCRIPTS_URL}" && tar xf $(basename "${BLFS_BOOTSCRIPTS_URL}") && ln -s blfs-bootscripts-${BLFS_BOOTSCRIPTS_VERSION} blfs-bootscripts
+# Last, the integration with nimmis init system
 ADD	my_initd_service /
 
 #CMD	[ "/usr/sbin/init" ]
