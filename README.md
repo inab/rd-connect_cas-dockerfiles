@@ -6,49 +6,71 @@ Some of the next steps depend on described at [README-CA.md](README-CA.md).
 Steps to create the containers
 --------------------------------
 
-1. Build CentOS common container, tagging it locally:
+2. Build CentOS+OpenJDK common containers, tagging it locally:
 
 	```bash
 	docker build -t rd-connect.eu/centos:7 centos_rd-connect
-	```
-
-2. Build CentOS+OpenJDK common container, tagging it locally:
-
-	```bash
 	docker build -t rd-connect.eu/openjdk:7 openjdk_rd-connect
 	```
-3. We generate the cas_data_container based on centos:7 oficial image:
-	
-	```bash
-	docker create -v /var/log -v /etc/tomcat -v /etc/tomcat7 -v /var/lib/tomcat7 -v /var/log/tomcat7 --name cas_data_container centos:7 /bin/true
-	```
-4. Build CentOS Tomcat container (for instance, 7.0.73), tagging it locally:
+5. Build RD-Connect OpenLDAP container, along with its images (to be used by CAS):
 
-	```bash
-	TOMCAT_TAG=7.0.73
-	docker build --build-arg="TOMCAT_TAG=${TOMCAT_TAG}" -t rd-connect.eu/tomcat:${TOMCAT_TAG} -t rd-connect.eu/tomcat:7 tomcat_rd-connect
-	```
-
-4. Build RD-Connect OpenLDAP container, along with its images (to be used by CAS):
-
-	2. We generate the ldap_data_container based on centos:7 oficial image:
+	1. If we do not have already one, we generate the ldap_data_container based on centos:7 oficial image:
 	
 	```bash
 	docker create -v /etc/openldap -v /var/lib/ldap -v /var/log --name ldap_data_container centos:7 /bin/true
 	```
 	
-	3. Build RD-Connect OpenLDAP container
+	2. Get the keys for the OpenLDAP image:
 	
 	```bash
 	CAS_TAG=cas-4.1.x
 	mkdir -p "${PWD}"/openldap_rd-connect/tmp
 	CAS_LDAP_CERTS_FILE=/tmp/cas-ldap-certs.tar
-	docker run --volumes-from ca_data_container rd-connect.eu/ca_data_container cas-ldap > "${PWD}"/openldap_rd-connect/"${CAS_LDAP_CERTS_FILE}"
-	docker build --build-arg="CAS_LDAP_CERTS_FILE=${CAS_LDAP_CERTS_FILE}" --build-arg="CASBRANCH=${CAS_TAG}" -t rd-connect.eu/cas-ldap:${CAS_TAG} openldap_rd-connect
+	LDAP_CERTS_PROFILE=cas-ldap
+	mkdir -p "${PWD}"/openldap_rd-connect/tmp
+	docker run --volumes-from ca_data_container rd-connect.eu/ca_data_container "${LDAP_CERTS_PROFILE}" > "${PWD}"/openldap_rd-connect/"${CAS_LDAP_CERTS_FILE}"
+	```
+	
+	3. Build RD-Connect OpenLDAP container:
+	
+	```bash
+	docker build --build-arg="LDAP_CERTS_PROFILE=${LDAP_CERTS_PROFILE}" --build-arg="CAS_LDAP_CERTS_FILE=${CAS_LDAP_CERTS_FILE}" -t rd-connect.eu/cas-ldap:${CAS_TAG} openldap_rd-connect
 	rm -fr "${PWD}"/openldap_rd-connect/tmp
 	```
+4. Build RD-Connect CAS container (for instance, ), tagging it locally:
+	1. Generate the certificates bundle to be used by RD-Connect CAS Tomcat:
+	```bash
+	mkdir -p "${PWD}"/rd-connect-CAS-server/tmp
+	CAS_TOMCAT_CERTS_FILE=/tmp/cas-tomcat-certs.tar
+	CAS_CERTS_PROFILE=cas-tomcat
+	docker run --volumes-from ca_data_container rd-connect.eu/ca_data_container "${CAS_CERTS_PROFILE}" > "${PWD}"/rd-connect-CAS-server/"${CAS_TOMCAT_CERTS_FILE}"
+	```
+	
+	2. Build the tomcat image, and generate the cas_tomcat_data_container based on centos:7 oficial image:
+	
+	```bash
+	TOMCAT_TAG=7.0.73
+	docker build --build-arg="TOMCAT_TAG=${TOMCAT_TAG}" -t rd-connect.eu/tomcat:${TOMCAT_TAG} -t rd-connect.eu/tomcat:7 tomcat_rd-connect
+	docker create -v /var/log -v /etc/cas -v /etc/tomcat7 --name cas_tomcat_data_container centos:7 /bin/true
+	```
+	
+	3. Extract the LDAP admin password from RD-Connect OpenLDAP container
+	
+	```bash
+	CAS_LDAP_PASS="$(docker run -i -t --rm rd-connect.eu/cas-ldap:cas-4.1.x grep '^domainPass' /etc/openldap/for_sysadmin.txt | cut -f 2 -d =)"
+	```
+	
+	4. Build RD-Connect CAS container:
 
-5. Steps to create the containers for Web User Management Interface Application.
+	```bash
+	mkdir -p "${PWD}"/rd-connect-CAS-server/tmp
+	docker run --volumes-from ca_data_container rd-connect.eu/ca_data_container "${CAS_CERTS_PROFILE}" > "${PWD}"/rd-connect-CAS-server/"${CAS_TOMCAT_CERTS_FILE}"
+	docker build --build-arg="CAS_CERTS_PROFILE=${CAS_CERTS_PROFILE}" --build-arg="CAS_TOMCAT_CERTS_FILE=${CAS_TOMCAT_CERTS_FILE}" --build-arg="CAS_LDAP_PASS=${CAS_LDAP_PASS}" --build-arg="CAS_RELEASE=${CAS_TAG}" -t rd-connect.eu/rdconnect_cas:${CAS_TAG} rd-connect-CAS-server
+	rm -fr "${PWD}"/rd-connect-CAS-server/tmp
+	```
+
+
+6. Steps to create the containers for Web User Management Interface Application.
 	1. We generate the umi_data_container based on centos:7 oficial image:
 	
 	```bash
