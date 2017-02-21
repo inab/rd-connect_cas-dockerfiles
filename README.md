@@ -28,7 +28,7 @@ Steps to create the containers
 	CAS_LDAP_CERTS_FILE=/tmp/cas-ldap-certs.tar
 	LDAP_CERTS_PROFILE=cas-ldap
 	mkdir -p "${PWD}"/openldap_rd-connect/tmp
-	docker run --volumes-from ca_data_container rd-connect.eu/ca_data_container "${LDAP_CERTS_PROFILE}" > "${PWD}"/openldap_rd-connect/"${CAS_LDAP_CERTS_FILE}"
+	docker run --volumes-from rd-connect_ca-store rd-connect.eu/rd-connect_ca "${LDAP_CERTS_PROFILE}" > "${PWD}"/openldap_rd-connect/"${CAS_LDAP_CERTS_FILE}"
 	```
 	
 	3. Build RD-Connect OpenLDAP container:
@@ -43,7 +43,7 @@ Steps to create the containers
 	mkdir -p "${PWD}"/rd-connect-CAS-server/tmp
 	CAS_TOMCAT_CERTS_FILE=/tmp/cas-tomcat-certs.tar
 	CAS_CERTS_PROFILE=cas-tomcat
-	docker run --volumes-from ca_data_container rd-connect.eu/ca_data_container "${CAS_CERTS_PROFILE}" > "${PWD}"/rd-connect-CAS-server/"${CAS_TOMCAT_CERTS_FILE}"
+	docker run --volumes-from rd-connect_ca-store rd-connect.eu/rd-connect_ca "${CAS_CERTS_PROFILE}" > "${PWD}"/rd-connect-CAS-server/"${CAS_TOMCAT_CERTS_FILE}"
 	```
 	
 	2. Build the tomcat image, and generate the cas_tomcat_data_container based on centos:7 oficial image:
@@ -63,8 +63,6 @@ Steps to create the containers
 	4. Build RD-Connect CAS container:
 
 	```bash
-	mkdir -p "${PWD}"/rd-connect-CAS-server/tmp
-	docker run --volumes-from ca_data_container rd-connect.eu/ca_data_container "${CAS_CERTS_PROFILE}" > "${PWD}"/rd-connect-CAS-server/"${CAS_TOMCAT_CERTS_FILE}"
 	docker build --build-arg="CAS_CERTS_PROFILE=${CAS_CERTS_PROFILE}" --build-arg="CAS_TOMCAT_CERTS_FILE=${CAS_TOMCAT_CERTS_FILE}" --build-arg="CAS_LDAP_PASS=${CAS_LDAP_PASS}" --build-arg="CAS_RELEASE=${CAS_TAG}" -t rd-connect.eu/rdconnect_cas:${CAS_TAG} rd-connect-CAS-server
 	rm -fr "${PWD}"/rd-connect-CAS-server/tmp
 	```
