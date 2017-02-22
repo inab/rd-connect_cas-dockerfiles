@@ -69,13 +69,14 @@ Steps to create the containers
 
 
 6. Steps to create the containers for Web User Management Interface Application.
-	1. We generate the umi_data_container based on centos:7 oficial image:
-	
+	1. Generate the certificates bundle to be used by RD-Connect User Management Interface:
 	```bash
-	docker create -v /var/log/httpd -v /etc/openldap -v /etc/phpldapadmin --name umi_data_container centos:7 /bin/true
-	docker cp blblblblblb umi_data_container:/etc/
+	mkdir -p "${PWD}"/phpldapadmin_rd-connect/tmp
+	HTTPD_CERTS_FILE=/tmp/cas-httpd-certs.tar
+	HTTPD_CERTS_PROFILE=cas-httpd
+	docker run --volumes-from rd-connect_ca-store rd-connect.eu/rd-connect_ca "${HTTPD_CERTS_PROFILE}" > "${PWD}"/phpldapadmin_rd-connect/"${HTTPD_CERTS_FILE}"
 	```
-	
+
 	2. Now we build CentOS Apache Web server image, tagging it locally and based on httpd_rd-connect:
 
 	```bash
@@ -83,18 +84,26 @@ Steps to create the containers
 	docker build -t rd-connect.eu/httpd:${HTTPD_TAG} httpd_rd-connect
 	```
 	
-	3. We augment it with phpldapadmin:
+	3. We augment it with phpldapadmin, which is going to install the needed certificates:
 	
 	```bash
 	PLA_TAG=latest
-	docker build -t rd-connect.eu/phpldapadmin:${PLA_TAG} phpldapadmin_rd-connect
+	docker build --build-arg="HTTPD_CERTS_PROFILE=${HTTPD_CERTS_PROFILE}" --build-arg="HTTPD_CERTS_FILE=${HTTPD_CERTS_FILE}" -t rd-connect.eu/phpldapadmin:${PLA_TAG} phpldapadmin_rd-connect
+	rm -fr "${PWD}"/rd-connect-CAS-server/tmp
 	```
 	
-	4. Now we build rd-connect.eu/umi the image that will create container to deploy user management interface
+	4. Now we build the rd-connect.eu/umi image that will create container to deploy user management interface
 	
 	```bash
 	UMI_TAG=latest
 	docker build -t rd-connect.eu/umi:${UMI_TAG} umi_rd-connect
+	```
+	
+	3. We generate the umi_data_container based on centos:7 oficial image:
+	
+	```bash
+	docker create -v /var/log/httpd -v /etc/openldap -v /etc/phpldapadmin --name umi_data_container centos:7 /bin/true
+	docker cp blblblblblb umi_data_container:/etc/
 	```
 	
 	5. Last, we run rd-connect.eu/umi based on rd-connect.eu/umi:${UMI_TAG} image, giving it a name of `rd-connect.eu_umi` and mounting volumes exported by `umi_data_container`
