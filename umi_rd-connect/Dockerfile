@@ -1,4 +1,4 @@
-FROM	rd-connect.eu/phpldapadmin:latest
+FROM	rd-connect.eu/rdconnect-umi-prereqs:latest
 MAINTAINER	Andrés Cañada Pallarés <acanada@cnio.es>, José María Fernández <jmfernandez@cnio.es>
 LABEL	Description="RD-Connect User Management Interface" Vendor="CNIO"
 
@@ -6,47 +6,35 @@ LABEL	Description="RD-Connect User Management Interface" Vendor="CNIO"
 #mkdir -p "${PWD}"/umi_rd-connect/tmp
 
 
-ENV NODE_VERSION=4.7.0
-ARG UMIBRANCH=latest
+ARG	USERMANAGEMENT_BRANCH=ldap
+ARG	USERMANAGEMENT_CHECKOUT=ea17d30fa24256617d358a621f1c77a5b2608734
+ARG	UMI_BRANCH=master
+ARG	UMI_CHECKOUT=b23bd3228103366633eb029a6cd2f1560deaf743
 
-RUN	yum update -y --setopt=tsflags=nodocs
-RUN	yum install -y --setopt=tsflags=nodocs gcc gcc-c++ automake flex \
-	bison make patch perl perl-devel perl-CPAN perl-Net-IDN-Encode \
-	perl-IO-Compress perl-Net-SSLeay perl-Crypt-SSLeay perl-XML-LibXML
-RUN	yum install -y --setopt=tsflags=nodocs epel-release git
-RUN	yum install -y --enablerepo=epel --setopt=tsflags=nodocs apg
+ARG	CAS_SERVER_URL=https://rdconnectcas.rd-connect.eu:9443/cas
+ARG	LDAP_SERVER=ldap.rd-connect.eu
+ARG	CAS_LDAP_USER="cn=admin,dc=rd-connect,dc=eu"
+# This is a placeholder for the true intermediate LDAP admin password
+ARG	CAS_LDAP_PASS=changeit
 
-
-RUN 	cd /tmp && \
-	wget -nv https://nodejs.org/download/release/v${NODE_VERSION}/node-v${NODE_VERSION}.tar.xz && \
-	tar xf node-v${NODE_VERSION}.tar.xz && \
-	cd node-v${NODE_VERSION} && \
-	./configure && \
-	make && \
-	make install && \
-	rm -rf /tmp/node-v*
-
-#RUN useradd -ms /bin/bash rdconnect-rest
-RUN	useradd -m -U -c 'RD-Connect REST API unprivileged user' rdconnect-rest
-#Configure apache for application
-
+# Configure apache for application
+# User was created in the prerequisites dockerfile
 USER	rdconnect-rest
 ENV	HOME=/home/rdconnect-rest
 WORKDIR	${HOME}
 
-ARG	USERMANAGEMENT_CHECKOUT=e615e07d218f6d3f6e47962668a7d16ba245ee61
-RUN	git clone https://github.com/inab/rd-connect-user-management.git && \
+RUN	git clone -b "${USERMANAGEMENT_BRANCH}" https://github.com/inab/rd-connect-user-management.git && \
 	cd rd-connect-user-management && \
 	git checkout "$USERMANAGEMENT_CHECKOUT"
 RUN	cd rd-connect-user-management && ./install-deps.sh
 RUN	mkdir -p RDConnect-UserManagement-REST-API
-RUN	cd rd-connect-user-management && cp -dpr configs user-management.cgi user-management.fcgi user-management.psgi libs "$HOME"/RDConnect-UserManagement-REST-API
+RUN	cd rd-connect-user-management && cp -dpr configs user-management.cgi user-management.fcgi user-management.psgi libs "$HOME"/RDConnect-UserManagement-REST-API && cp template-config.ini "$HOME"/RDConnect-UserManagement-REST-API/configs/user-management.ini
+RUN	sed -i "s/^.*ldap_host=.*/ldap_host=${LDAP_SERVER}/; s/^.*ldap_user=.*/ldap_user=${CAS_LDAP_USER}/; s/^.*ldap_pass=.*/ldap_pass=${CAS_LDAP_PASS}/; s#^cas_url=.*#cas_url=${CAS_SERVER_URL}#;" RDConnect-UserManagement-REST-API/configs/user-management.ini
 
 ENV	UMI_CLONE=${HOME}/user-management-interface
 WORKDIR ${UMI_CLONE}
 
-ARG	UMI_CHECKOUT=82abdce80694f0c5694dc335cb6fb08fb29ec4ac
-RUN	git clone https://github.com/inab/rd-connect-user-management-interface.git "${UMI_CLONE}" && \
+RUN	git clone -b "${UMI_BRANCH}" https://github.com/inab/rd-connect-user-management-interface.git "${UMI_CLONE}" && \
 	cd "${UMI_CLONE}" && \
 	git checkout "${UMI_CHECKOUT}"
 RUN	npm install
@@ -85,5 +73,4 @@ RUN	sed -e '/<\/VirtualHost>/r /tmp/umi.conf' -e 'x;$G' -i /etc/httpd/conf.d/ssl
 RUN	yum autoremove -y git
 RUN	yum clean all
 
-EXPOSE 80 443
-VOLUME	[ "/var/log/httpd", "/home/rdconnect-rest/RDConnect-UserManagement-REST-API/configs"]
+VOLUME	[ "/home/rdconnect-rest/RDConnect-UserManagement-REST-API/configs"]

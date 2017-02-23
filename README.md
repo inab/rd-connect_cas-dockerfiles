@@ -92,11 +92,18 @@ Steps to create the containers
 	rm -fr "${PWD}"/rd-connect-CAS-server/tmp
 	```
 	
-	4. Now we build the rd-connect.eu/umi image that will create container to deploy user management interface
+	4. We build the rd-connect.eu/rdconnect-umi-prereqs image
 	
 	```bash
 	UMI_TAG=latest
-	docker build -t rd-connect.eu/umi:${UMI_TAG} umi_rd-connect
+	docker build -t rd-connect.eu/rdconnect-umi-prereqs:${UMI_TAG} umi-prereqs_rd-connect
+	```
+	
+	4. Now we build the rd-connect.eu/rdconnect-umi image that will create container to deploy user management interface
+	
+	```bash
+	UMI_TAG=latest
+	docker build --build-arg="CAS_LDAP_PASS=${CAS_LDAP_PASS}" -t rd-connect.eu/rdconnect-umi:${UMI_TAG} umi_rd-connect
 	```
 	
 	3. We generate the umi_data_container based on centos:7 oficial image:
