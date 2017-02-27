@@ -24,7 +24,6 @@ Steps to create the containers
 	
 	```bash
 	CAS_TAG=cas-4.1.x
-	mkdir -p "${PWD}"/openldap_rd-connect/tmp
 	CAS_LDAP_CERTS_FILE=/tmp/cas-ldap-certs.tar
 	LDAP_CERTS_PROFILE=cas-ldap
 	mkdir -p "${PWD}"/openldap_rd-connect/tmp
@@ -40,9 +39,9 @@ Steps to create the containers
 4. Build RD-Connect CAS container, tagging it locally:
 	1. Generate the certificates bundle to be used by RD-Connect CAS Tomcat:
 	```bash
-	mkdir -p "${PWD}"/rd-connect-CAS-server/tmp
 	CAS_TOMCAT_CERTS_FILE=/tmp/cas-tomcat-certs.tar
 	CAS_CERTS_PROFILE=cas-tomcat
+	mkdir -p "${PWD}"/rd-connect-CAS-server/tmp
 	docker run --volumes-from rd-connect_ca-store rd-connect.eu/rd-connect_ca "${CAS_CERTS_PROFILE}" > "${PWD}"/rd-connect-CAS-server/"${CAS_TOMCAT_CERTS_FILE}"
 	```
 	
@@ -68,7 +67,7 @@ Steps to create the containers
 	```
 
 
-6. Steps to create the containers for Web User Management Interface Application.
+5. Steps to create the containers for Web User Management Interface Application.
 	1. Generate the certificates bundle to be used by RD-Connect User Management Interface:
 	```bash
 	mkdir -p "${PWD}"/phpldapadmin_rd-connect/tmp
@@ -99,7 +98,7 @@ Steps to create the containers
 	docker build -t rd-connect.eu/rdconnect-umi-prereqs:${UMI_TAG} umi-prereqs_rd-connect
 	```
 	
-	4. Now we build the rd-connect.eu/rdconnect-umi image that will create container to deploy user management interface
+	5. Now we build the rd-connect.eu/rdconnect-umi image that will create container to deploy user management interface
 	
 	```bash
 	UMI_TAG=latest
