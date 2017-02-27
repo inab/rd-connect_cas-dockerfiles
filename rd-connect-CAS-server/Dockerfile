@@ -8,7 +8,7 @@ LABEL	Description="Server setup needed by RD-Connect CAS + CAS Management + PWM"
 RUN	yum install -y git java-devel ant ant-contrib maven apg
 
 ARG	CAS_TAG=cas-4.1.x
-ARG	CAS_RELEASE=e24d4d2ff958994272c04c6d9b55f5f0f73ff6b6
+ARG	CAS_RELEASE=23b48851c7a2e84ed8c0e413c0f6c87991bc5545
 ENV	CASCLONE=/tmp/ldap-cas-${CAS_RELEASE}
 ARG	CAS_CERTS_PROFILE=cas-tomcat
 ARG	CAS_TOMCAT_CERTS_FILE=/tmp/cas-tomcat-certs.tar

@@ -1,18 +1,21 @@
-RD-Connect CAS / LDAP containers
-================================
+RD-Connect CAS / LDAP / UMI containers
+==================================
+
+* `generateImages.sh` script automates the RD-Connect CAS images generation with a set of random passwords and self-signed certificates.
+
+Steps to create the containers by hand
+----------------------------------
 
 Some of the next steps depend on described at [README-CA.md](README-CA.md).
 
-Steps to create the containers
---------------------------------
 
-2. Build CentOS+OpenJDK common containers, tagging it locally:
+1. Build CentOS+OpenJDK common containers, tagging it locally:
 
 	```bash
 	docker build -t rd-connect.eu/centos:7 centos_rd-connect
 	docker build -t rd-connect.eu/openjdk:7 openjdk_rd-connect
 	```
-5. Build RD-Connect OpenLDAP container, along with its images (to be used by CAS):
+2. Build RD-Connect OpenLDAP container, along with its images (to be used by CAS):
 
 	1. If we do not have already one, we generate the ldap_data_container based on centos:7 oficial image:
 	
@@ -36,7 +39,7 @@ Steps to create the containers
 	docker build --build-arg="LDAP_CERTS_PROFILE=${LDAP_CERTS_PROFILE}" --build-arg="CAS_LDAP_CERTS_FILE=${CAS_LDAP_CERTS_FILE}" -t rd-connect.eu/cas-ldap:${CAS_TAG} openldap_rd-connect
 	rm -fr "${PWD}"/openldap_rd-connect/tmp
 	```
-4. Build RD-Connect CAS container, tagging it locally:
+3. Build RD-Connect CAS container, tagging it locally:
 	1. Generate the certificates bundle to be used by RD-Connect CAS Tomcat:
 	```bash
 	CAS_TOMCAT_CERTS_FILE=/tmp/cas-tomcat-certs.tar
