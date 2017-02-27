@@ -84,4 +84,6 @@ if [ $# -gt 0 ]; then
 	done
 fi
 
+# We assure reproducibility with this sentence
+touch --date=@0 "$resDir"
 tar -c -h -C "${resDir}" -f - . 1>&6
