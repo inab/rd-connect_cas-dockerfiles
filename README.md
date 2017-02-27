@@ -2,6 +2,7 @@ RD-Connect CAS / LDAP / UMI containers
 ==================================
 
 * `generateImages.sh` script automates the RD-Connect CAS images generation with a set of random passwords and self-signed certificates.
+* Once run, `startInstances.sh` allows creating instances based on all the main images, and starting them. `stopInstances.sh` stops those instances.
 
 Steps to create the containers by hand
 ----------------------------------
