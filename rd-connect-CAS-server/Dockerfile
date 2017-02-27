@@ -51,6 +51,9 @@ RUN	rm -rf "${CASCLONE}" "${CAS_MGMT_CLONE}" "${LOCAL_CAS_TOMCAT_CERTS_DIR}" ~/.
 RUN	yum autoremove -y git ant ant-contrib maven apg
 RUN	yum clean all
 
+# There is a bug in Docker 1.12, where inherited volumes sometimes do not get the proper permissions
+RUN	chown -R tomcat: /etc/tomcat7
+
 # This must be the last sentence, otherwise we are losing all the setups!!!
 EXPOSE	9443
 VOLUME	[ "/etc/cas", "/etc/tomcat7", "/var/log/cas" ]

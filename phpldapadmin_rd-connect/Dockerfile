@@ -42,4 +42,4 @@ RUN	sed -i  "s#\$servers->setValue('server','name','Local LDAP Server')#\$server
 	sed -i  "/RD-Connect LDAP Server/a \$servers->setValue('login','bind_id','');" /etc/phpldapadmin/config.php && \
 	sed -i  "/RD-Connect LDAP Server/a \$servers->setValue('login','bind_pass','');" /etc/phpldapadmin/config.php
 
-VOLUME	[ "/etc/phpldapadmin", "/etc/openldap", "/etc/pki/certs" ]
+VOLUME	[ "/etc/openldap", "/etc/pki/certs" ]
