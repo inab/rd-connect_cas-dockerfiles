@@ -2,4 +2,4 @@
 
 set -e
 
-docker stop demo_umi demo_cas demo_casldap
+docker stop demo_umi demo_pla demo_cas demo_casldap
