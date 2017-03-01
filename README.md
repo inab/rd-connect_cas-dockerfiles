@@ -10,11 +10,11 @@ Steps to create the containers by hand
 Some of the next steps depend on described at [README-CA.md](README-CA.md).
 
 
-1. Build CentOS+OpenJDK common containers, tagging it locally:
+1. Build CentOS and OpenJDK common containers, tagging it locally:
 
 	```bash
 	docker build -t rd-connect.eu/centos:7 centos_rd-connect
-	docker build -t rd-connect.eu/openjdk:7 openjdk_rd-connect
+	docker build -t rd-connect.eu/openjdk:8 openjdk_rd-connect
 	```
 2. Build RD-Connect OpenLDAP container, along with its images (to be used by CAS):
 

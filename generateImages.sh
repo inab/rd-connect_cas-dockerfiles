@@ -51,7 +51,7 @@ mkdir -p "${dockerFileDir}"/rd-connect-CAS-server/tmp
 docker run --rm --volumes-from rd-connect_ca-store rd-connect.eu/rd-connect_ca "${CAS_CERTS_PROFILE}" > "${dockerFileDir}"/rd-connect-CAS-server/"${CAS_TOMCAT_CERTS_FILE}"
 
 # Dependency: OpenJDK image
-docker build -t rd-connect.eu/openjdk:7 openjdk_rd-connect
+docker build -t rd-connect.eu/openjdk:8 openjdk_rd-connect
 
 # Dependency: Tomcat, image
 TOMCAT_TAG=7.0.75

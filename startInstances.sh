@@ -22,6 +22,7 @@ docker create --name demo_pla -p "$HOST_PLAPORT:443" --link demo_casldap:ldap.rd
 # User Management Interface
 docker create --name demo_umi -p "$HOST_UMIPORT:443" --link demo_casldap:ldap.rd-connect.eu --link demo_cas:rdconnectcas.rd-connect.eu rd-connect.eu/rdconnect-umi:latest
 
+echo "RD-Connect CAS Tomcat manager app is available at https://127.0.0.1:$HOST_CASPORT/manager/html"
 echo "RD-Connect CAS is available at https://127.0.0.1:$HOST_CASPORT/cas/login"
 echo "RD-Connect UMI is available at https://127.0.0.1:$HOST_UMIPORT/user-management/"
 echo "RD-Connect phpLDAPadmin is available at https://127.0.0.1:$HOST_PLAPORT/phpldapadmin/"
@@ -31,6 +32,15 @@ tempF="$(tempfile)"
 docker cp demo_casldap:/etc/openldap/for_sysadmin.txt "$tempF"
 casPass="$(grep '^rootPass' "$tempF" | cut -f 2 -d =)"
 domainPass="$(grep '^domainPass' "$tempF" | cut -f 2 -d =)"
+rm -f "${tempF}"
+
+tempF="$(tempfile)"
+docker cp demo_cas:/etc/tomcat7/tomcat-users.xml "$tempF"
+tomcatUser="$(grep '<user .*manager-gui' "$tempF" | grep -o "name='[^']*'" | cut -f 2 -d "'")"
+tomcatPass="$(grep '<user .*manager-gui' "$tempF" | grep -o "password='[^']*'" | cut -f 2 -d "'")"
+rm -f "${tempF}"
+
+echo "Tomcat manager Credentials => user: $tomcatUser; password: $tomcatPass"
 echo "CAS Credentials => user: platform@rd-connect.eu ; password: $casPass"
 echo "PLA Credentials => user: cn=admin,dc=rd-connect,dc=eu ; password: $domainPass"
 echo

@@ -1,4 +1,4 @@
-FROM	rd-connect.eu/openjdk:7
+FROM	rd-connect.eu/openjdk:8
 MAINTAINER	José María Fernández <jmfernandez@cnio.es>
 
 # Use a single LABEL (multiple ones are discouraged because each one creates a new layer)
