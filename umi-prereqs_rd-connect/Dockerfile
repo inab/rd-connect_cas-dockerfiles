@@ -43,4 +43,4 @@ RUN 	cd /tmp && \
 	rm -rf /tmp/node-v*
 
 #RUN useradd -ms /bin/bash rdconnect-rest
-RUN	useradd -m -U -c 'RD-Connect REST API unprivileged user' rdconnect-rest
+#RUN	useradd -m -U -c 'RD-Connect REST API unprivileged user' rdconnect-rest

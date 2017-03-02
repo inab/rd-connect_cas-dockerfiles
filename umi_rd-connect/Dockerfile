@@ -17,6 +17,7 @@ ARG	CAS_LDAP_USER="cn=admin,dc=rd-connect,dc=eu"
 # This is a placeholder for the true intermediate LDAP admin password
 ARG	CAS_LDAP_PASS=changeit
 
+RUN	useradd -m -U -c 'RD-Connect REST API unprivileged user' rdconnect-rest
 # Configure apache for application
 # User was created in the prerequisites dockerfile
 USER	rdconnect-rest
@@ -32,11 +33,11 @@ RUN	cd rd-connect-user-management && cp -dpr configs user-management.cgi user-ma
 RUN	sed -i "s/^.*ldap_host=.*/ldap_host=${LDAP_SERVER}/; s/^.*ldap_user=.*/ldap_user=${CAS_LDAP_USER}/; s/^.*ldap_pass=.*/ldap_pass=${CAS_LDAP_PASS}/; s#^cas_url=.*#cas_url=${CAS_SERVER_URL}#;" RDConnect-UserManagement-REST-API/configs/user-management.ini
 
 ENV	UMI_CLONE=${HOME}/user-management-interface
-WORKDIR ${UMI_CLONE}
 
 RUN	git clone -b "${UMI_BRANCH}" https://github.com/inab/rd-connect-user-management-interface.git "${UMI_CLONE}" && \
 	cd "${UMI_CLONE}" && \
 	git checkout "${UMI_CHECKOUT}"
+WORKDIR ${UMI_CLONE}
 RUN	npm install
 RUN	PATH="${UMI_CLONE}/node_modules/.bin:$PATH" gulp build
 RUN	mkdir -p "$HOME/DOCUMENT_ROOT" && cp -dpTr build "$HOME/DOCUMENT_ROOT/user-management"
