@@ -1,0 +1,31 @@
+version: '2'
+services:
+  ldap:
+    domainname: ldap.rd-connect.eu
+    hostname: ldap
+    image: "rd-connect.eu/cas-ldap:cas-4.1.x"
+  cas:
+    depends_on:
+       - ldap
+    domainname: rdconnectcas.rd-connect.eu
+    hostname: rdconnectcas
+    image: "rd-connect.eu/rdconnect_cas:cas-4.1.x"
+    ports:
+       - "9443:9443"
+  pla:
+    depends_on:
+       - ldap
+    domainname: rdconnect-pla.rd-connect.eu
+    hostname: rdconnect-pla
+    image: "rd-connect.eu/phpldapadmin:latest"
+    ports:
+      - "9444:443"
+  umi:
+    depends_on:
+      - ldap
+      - cas
+    domainname: rdconnect-umi.rd-connect.eu
+    hostname: rdconnect-umi
+    image: "rd-connect.eu/rdconnect-umi:latest"
+    ports:
+      - "9445:443"
