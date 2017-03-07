@@ -4,6 +4,32 @@ RD-Connect CAS / LDAP / UMI containers
 * `generateImages.sh` script automates the RD-Connect CAS images generation with a set of random passwords and self-signed certificates.
 * Once run, `startInstances.sh` allows creating instances based on all the main images, and starting them. `stopInstances.sh` stops those instances.
 
+Instructions
+----------------------------------
+
+1. Download the code
+
+	```bash
+	git clone https://github.com/inab/rd-connect_cas-dockerfiles.git
+	```
+2. Enter the directory
+  ```bash
+	cd rd-connect_cas-dockerfiles
+	```
+3. Create the images
+  ```bash
+	./genereateImages.sh
+	```
+4. Enter rd-connect-compose directory
+  ```bash
+	cd rd-connect-compose
+	```
+5. Create the instances
+  ```bash
+	docker-compose up
+	```
+
+
 Steps to create the containers by hand
 ----------------------------------
 
