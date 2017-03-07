@@ -14,20 +14,20 @@ Instructions
 	```
 2. Enter the directory
   ```
-	cd rd-connect_cas-dockerfiles
-	```
+  cd rd-connect_cas-dockerfiles
+  ```
 3. Create the images
   ```
-	./genereateImages.sh
-	```
+  ./genereateImages.sh
+  ```
 4. Enter rd-connect-compose directory
   ```
-	cd rd-connect-compose
-	```
+  cd rd-connect-compose
+  ```
 5. Create the instances
   ```
-	docker-compose up
-	```
+  docker-compose up
+  ```
 
 
 Steps to create the containers by hand
