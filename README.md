@@ -13,19 +13,19 @@ Instructions
 	git clone https://github.com/inab/rd-connect_cas-dockerfiles.git
 	```
 2. Enter the directory
-  ```bash
+  ```
 	cd rd-connect_cas-dockerfiles
 	```
 3. Create the images
-  ```bash
+  ```
 	./genereateImages.sh
 	```
 4. Enter rd-connect-compose directory
-  ```bash
+  ```
 	cd rd-connect-compose
 	```
 5. Create the instances
-  ```bash
+  ```
 	docker-compose up
 	```
 
