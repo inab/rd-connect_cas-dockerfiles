@@ -23,11 +23,13 @@ Instructions
   	./genereateImages.sh
   	```
 4. Enter rd-connect-compose directory
-  	```bash
+  	
+	```bash
   	cd rd-connect-compose
   	```
 5. Create the instances
-  	```bash
+  	
+	```bash
   	docker-compose up
   	```
 
