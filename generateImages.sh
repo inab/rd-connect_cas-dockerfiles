@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 dockerFileDir="$(dirname "$0")"
 case "${dockerFileDir}" in
@@ -12,7 +12,8 @@ esac
 
 # This is a data container needed by CA
 cd "${dockerFileDir}"
-docker create -v /etc/rd-connect_keystore --name rd-connect_ca-store centos:7 /bin/true
+docker volume create --name rd-connect_ca-vol
+docker create -v rd-connect_ca-vol:/etc/rd-connect_keystore --name rd-connect_ca-store centos:7 /bin/true
 
 # From this point, any failure will stop the batch script
 set -e
@@ -34,7 +35,7 @@ CAS_TAG=cas-4.1.x
 CAS_LDAP_CERTS_FILE=/tmp/cas-ldap-certs.tar
 LDAP_CERTS_PROFILE=cas-ldap
 mkdir -p "${dockerFileDir}"/openldap_rd-connect/tmp
-docker run --rm --volumes-from rd-connect_ca-store rd-connect.eu/rd-connect_ca "${LDAP_CERTS_PROFILE}" > "${dockerFileDir}"/openldap_rd-connect/"${CAS_LDAP_CERTS_FILE}"
+docker run --rm -v rd-connect_ca-vol:/etc/rd-connect_keystore rd-connect.eu/rd-connect_ca "${LDAP_CERTS_PROFILE}" > "${dockerFileDir}"/openldap_rd-connect/"${CAS_LDAP_CERTS_FILE}"
 
 # CAS OpenLDAP image
 docker build --build-arg="LDAP_CERTS_PROFILE=${LDAP_CERTS_PROFILE}" --build-arg="CAS_LDAP_CERTS_FILE=${CAS_LDAP_CERTS_FILE}" -t rd-connect.eu/cas-ldap:${CAS_TAG} openldap_rd-connect
@@ -48,7 +49,7 @@ rm -fr "${dockerFileDir}"/openldap_rd-connect/tmp
 CAS_TOMCAT_CERTS_FILE=/tmp/cas-tomcat-certs.tar
 CAS_CERTS_PROFILE=cas-tomcat
 mkdir -p "${dockerFileDir}"/rd-connect-CAS-server/tmp
-docker run --rm --volumes-from rd-connect_ca-store rd-connect.eu/rd-connect_ca "${CAS_CERTS_PROFILE}" > "${dockerFileDir}"/rd-connect-CAS-server/"${CAS_TOMCAT_CERTS_FILE}"
+docker run --rm -v rd-connect_ca-vol:/etc/rd-connect_keystore rd-connect.eu/rd-connect_ca "${CAS_CERTS_PROFILE}" > "${dockerFileDir}"/rd-connect-CAS-server/"${CAS_TOMCAT_CERTS_FILE}"
 
 # Dependency: OpenJDK image
 docker build -t rd-connect.eu/openjdk:8 openjdk_rd-connect
@@ -70,7 +71,7 @@ rm -fr "${dockerFileDir}"/rd-connect-CAS-server/tmp
 mkdir -p "${dockerFileDir}"/phpldapadmin_rd-connect/tmp
 HTTPD_CERTS_FILE=/tmp/cas-pla-certs.tar
 HTTPD_CERTS_PROFILE=cas-pla
-docker run --rm --volumes-from rd-connect_ca-store rd-connect.eu/rd-connect_ca "${HTTPD_CERTS_PROFILE}" > "${dockerFileDir}"/phpldapadmin_rd-connect/"${HTTPD_CERTS_FILE}"
+docker run --rm -v rd-connect_ca-vol:/etc/rd-connect_keystore rd-connect.eu/rd-connect_ca "${HTTPD_CERTS_PROFILE}" > "${dockerFileDir}"/phpldapadmin_rd-connect/"${HTTPD_CERTS_FILE}"
 
 # Dependency: Apache 2.4
 HTTPD_TAG=2.4
@@ -89,7 +90,7 @@ rm -fr "${dockerFileDir}"/phpldapadmin_rd-connect/tmp
 mkdir -p "${dockerFileDir}"/umi-prereqs_rd-connect/tmp
 UMI_HTTPD_CERTS_FILE=/tmp/cas-httpd-certs.tar
 UMI_HTTPD_CERTS_PROFILE=cas-httpd
-docker run --rm --volumes-from rd-connect_ca-store rd-connect.eu/rd-connect_ca "${UMI_HTTPD_CERTS_PROFILE}" > "${dockerFileDir}"/umi-prereqs_rd-connect/"${UMI_HTTPD_CERTS_FILE}"
+docker run --rm -v rd-connect_ca-vol:/etc/rd-connect_keystore rd-connect.eu/rd-connect_ca "${UMI_HTTPD_CERTS_PROFILE}" > "${dockerFileDir}"/umi-prereqs_rd-connect/"${UMI_HTTPD_CERTS_FILE}"
 
 
 # Dependency: User Management Interface prerequisites (plus https certificates) image

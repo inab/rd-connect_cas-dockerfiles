@@ -17,4 +17,4 @@ source "${dockerFileDir}"/declDataVolumes.sh.common
 
 echo "Using prefix '${prefix}' for data volumes and instances"
 
-docker_stop_instances "${prefix}"
+docker_remove_instances "${prefix}"

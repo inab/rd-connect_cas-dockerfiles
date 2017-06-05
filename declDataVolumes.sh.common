@@ -1,0 +1,187 @@
+#!/bin/bash
+
+# Setting up the prefix
+if [ $# -gt 0 ] ; then
+	prefix="$1"
+	shift
+else
+	prefix="demo"
+fi
+
+# Adding a separator (if needed)
+if [ "$prefix" != "" ] ; then
+	prefix+=_
+fi
+
+declare -a instances=(
+	"casldap"
+	"cas"
+	"pla"
+	"umi"
+)
+
+# Format: docker instance name, docker image
+declare -A images=(
+	["casldap"]="rd-connect.eu/cas-ldap:cas-4.1.x"
+	["cas"]="rd-connect.eu/rdconnect_cas:cas-4.1.x"
+	["pla"]="rd-connect.eu/phpldapadmin:latest"
+	["umi"]="rd-connect.eu/rdconnect-umi:latest"
+)
+
+
+docker_start_instances() {
+	local prefix="$1"
+	
+	local -a prefixInstances
+	#for instance in "${!images[@]}" ; do
+	for instance in "${instances[@]}" ; do
+		prefixInstances+=( "${prefix}${instance}" )
+		#echo "key  : $instance"
+		#echo "value: ${images[$instance]}"
+	done
+	docker start "${prefixInstances[@]}"
+}
+
+docker_stop_instances() {
+	local prefix="$1"
+	
+	local -a prefixInstances
+	#for instance in "${!images[@]}" ; do
+	for instance in "${instances[@]}" ; do
+		prefixInstances=( "${prefix}${instance}" "${prefixInstances[@]}" )
+		#echo "key  : $instance"
+		#echo "value: ${images[$instance]}"
+	done
+	docker stop "${prefixInstances[@]}"
+}
+
+docker_remove_instances() {
+	local prefix="$1"
+	
+	local -a prefixInstances
+	#for instance in "${!images[@]}" ; do
+	for instance in "${instances[@]}" ; do
+		prefixInstances=( "${prefix}${instance}" "${prefixInstances[@]}" )
+		#echo "key  : $instance"
+		#echo "value: ${images[$instance]}"
+	done
+	docker rm "${prefixInstances[@]}"
+}
+
+
+declare -A hostnames=(
+	["casldap"]="ldap.rd-connect.eu"
+	["cas"]="rdconnectcas.rd-connect.eu"
+	["pla"]="rdconnect-pla.rd-connect.eu"
+	["umi"]="rdconnect-umi.rd-connect.eu"
+)
+
+# Format: docker image , docker volume , mountpoint in the docker image
+
+# LDAP
+declare -a CASLDAPconf=( "casldap"	"ldap_conf"	"/etc/openldap" )
+declare -a CASLDAPdb=( "casldap"	"ldap_db"	"/var/lib/ldap" )
+declare -a CASLDAPlogs=( "casldap"	"ldap_logs"	"/var/log" )
+
+# CAS
+declare -a CASconf=( "cas"	"cas_conf"	"/etc/cas" )
+declare -a CASTOMCATconf=( "cas"	"tomcat_conf"	"/etc/tomcat7" )
+declare -a CASlogs=( "cas"	"cas_logs"	"/var/log" )
+declare -a PWMstate=( "cas"	"pwm_state"	"/var/lib/pwm" )
+
+# PLA
+declare -a PLAconf=( "pla"	"pla_conf"	"/etc/phpldapadmin" )
+declare -a PLAldap=( "pla"	"pla_ldap"	"/etc/openldap" )
+declare -a PLApki=( "pla"	"pla_pki"	"/etc/pki/tls" )
+declare -a PLAlogs=( "pla"	"pla_logs"	"/var/log/httpd" )
+
+# UMI
+declare -a UMIconf=( "umi"	"umi_conf"	"/home/rdconnect-rest/RDConnect-UserManagement-REST-API/configs" )
+declare -a UMIldap=( "umi"	"umi_ldap"	"/etc/openldap" )
+declare -a UMIpki=( "umi"	"umi_pki"	"/etc/pki/tls" )
+declare -a UMIlogs=( "umi"	"umi_logs"	"/var/log/httpd" )
+
+declare -a volumes=(
+	CASLDAPconf[@]
+	CASLDAPdb[@]
+	CASLDAPlogs[@]
+	CASconf[@]
+	CASTOMCATconf[@]
+	CASlogs[@]
+	PWMstate[@]
+	PLAconf[@]
+	PLAldap[@]
+	PLApki[@]
+	PLAlogs[@]
+	UMIconf[@]
+	UMIldap[@]
+	UMIpki[@]
+	UMIlogs[@]
+)
+
+numVolumes=${#volumes[@]}
+
+declare -a cas_casldap=( "cas"	"casldap" )
+declare -a pla_casldap=( "pla"	"casldap" )
+declare -a umi_casldap=( "umi"	"casldap" )
+declare -a umi_cas=( "umi"	"cas" )
+
+declare -a links=(
+	cas_casldap[@]
+	pla_casldap[@]
+	umi_casldap[@]
+	umi_cas[@]
+)
+
+numLinks=${#links[@]}
+
+## Loop and print it.  Using offset and length to extract values
+#for ((iVol=0; iVol<$numVolumes; iVol++)) ; do
+#	instanceName="${prefix}${!volumes[iVol]:0:1}"
+#	volumeName="${prefix}${!volumes[iVol]:1:1}"
+#	mountPoint="${!volumes[iVol]:2:1}"
+#	echo "Instance ${instanceName}"
+#	echo "volume ${volumeName}"
+#	echo "mountpoint ${mountPoint}"
+#done
+
+docker_create() {
+	local prefix="$1"
+	local instance="$2"
+	local hostPort
+	local instancePort
+	
+	local -a portDecl
+	if [ $# -ge 4 ] ; then
+		hostPort="$3"
+		instancePort="$4"
+		portDecl+=( -p "${hostPort}:${instancePort}" )
+	fi
+	
+	local -a volDecl
+	for ((iVol=0; iVol<$numVolumes; iVol++)) ; do
+		local instanceName="${!volumes[iVol]:0:1}"
+		if [ "$instanceName" = "$instance" ] ; then
+			local volumeName="${prefix}${!volumes[iVol]:1:1}"
+			local mountPoint="${!volumes[iVol]:2:1}"
+			volDecl+=( -v "${volumeName}:${mountPoint}" )
+		fi
+	#	volumeName="${prefix}${!volumes[iVol]:1:1}"
+	#	mountPoint="${!volumes[iVol]:2:1}"
+	#	echo "Instance ${instanceName}"
+	#	echo "volume ${volumeName}"
+	#	echo "mountpoint ${mountPoint}"
+	done
+	
+	local -a linkDecl
+	for ((iLink=0; iLink<$numLinks; iLink++)) ; do
+		local instanceName="${!links[iLink]:0:1}"
+		if [ "$instanceName" = "$instance" ] ; then
+			destName="${!links[iLink]:1:1}"
+			hostName="${hostnames[$destName]}"
+			linkDecl+=( --link "${prefix}${destName}:${hostName}" )
+		fi
+	done
+	
+	docker create --name "${prefix}${instance}" "${portDecl[@]}" "${volDecl[@]}" "${linkDecl[@]}" "${images[$instance]}"
+}

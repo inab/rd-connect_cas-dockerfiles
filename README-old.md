@@ -1,66 +1,4 @@
-RD-Connect CAS / LDAP / UMI containers
-==================================
-
-* `generateImages.sh` script automates the RD-Connect CAS images generation with a set of random passwords and self-signed certificates.
-* Once run, `startInstances.sh` allows creating instances based on all the main images, and starting them. `stopInstances.sh` stops those instances.
-
-Instructions
-----------------------------------
-
-1. Download the code
-
-	```bash
-	git clone https://github.com/inab/rd-connect_cas-dockerfiles.git
-	```
-2. Enter the directory
-
-  	```bash
-  	cd rd-connect_cas-dockerfiles
-  	```
-3. Create the images
-  
-  	```bash
-  	./generateImages.sh
-  	```
-4. (OPTIONAL) If they do not exist, create the data volumes
-
-	```bash
-	./initDataVolumes.sh [volumes prefix]
-	```
-
-5. (OPTIONAL) If it is needed, populate the data volumes from the initial setup in the images
-
-	```bash
-	./populateDataVolumes.sh [volumes prefix]
-	```
-
-6. (OPTIONAL) If it is needed, remove previous instances based on previous images
-
-	```bash
-	./removeInstances.sh [volumes prefix]
-	```
-
-7. Create instances based on newly built images
-
-	```bash
-	./createInstances.sh [volumes prefix]
-	```
-
-8. Start the instances, using either of these methods:
-	a. Using `startInstances.sh` script (it will tell you the random credentials generated for the initial setup).
-	  
-		```bash
-		./startInstances [volumes prefix]
-		```
-
-	b. Enter rd-connect-compose directory and run the whole workflow
-		
-		```bash
-		cd rd-connect-compose
-		docker-compose up
-		```
-
-Steps to create the containers by hand (OUTDATED)
+Steps to create the containers by hand (using data containers)
 ----------------------------------
 
 Some of the next steps depend on described at [README-CA.md](README-CA.md).
@@ -74,15 +12,10 @@ Some of the next steps depend on described at [README-CA.md](README-CA.md).
 	```
 2. Build RD-Connect OpenLDAP container, along with its images (to be used by CAS):
 
-	1. If we do not have already one, we generate the LDAP data volumes:
+	1. If we do not have already one, we generate the ldap_data_container based on centos:7 oficial image:
 	
 	```bash
-	# For /etc/openldap
-	docker volume create --name ldap_conf
-	# For /var/lib/ldap
-	docker volume create --name ldap_db
-	# For /var/log
-	docker volume create --name ldap_logs
+	docker create -v /etc/openldap -v /var/lib/ldap -v /var/log --name ldap_data_container centos:7 /bin/true
 	```
 	
 	2. Get the encryption keys for the OpenLDAP image:
@@ -110,23 +43,18 @@ Some of the next steps depend on described at [README-CA.md](README-CA.md).
 	docker run --rm -v rd-connect_ca-vol:/etc/rd-connect_keystore rd-connect.eu/rd-connect_ca "${CAS_CERTS_PROFILE}" > "${PWD}"/rd-connect-CAS-server/"${CAS_TOMCAT_CERTS_FILE}"
 	```
 	
-	2. Build the tomcat image, and generate the data volumes to be used:
+	2. Build the tomcat image, and generate the cas_tomcat_data_container based on centos:7 oficial image:
 	
 	```bash
 	TOMCAT_TAG=7.0.75
 	docker build --build-arg="TOMCAT_TAG=${TOMCAT_TAG}" -t rd-connect.eu/tomcat:${TOMCAT_TAG} -t rd-connect.eu/tomcat:7 tomcat_rd-connect
-	# For /etc/cas
-	docker volume create --name cas_conf
-	# For /etc/tomcat7
-	docker volume create --name tomcat_conf
-	# For /var/log
-	docker volume create --name cas_logs
+	docker create -v /var/log -v /etc/cas -v /etc/tomcat7 --name cas_tomcat_data_container centos:7 /bin/true
 	```
 	
 	3. Extract the LDAP admin password from RD-Connect OpenLDAP container
 	
 	```bash
-	CAS_LDAP_PASS="$(docker run --rm rd-connect.eu/cas-ldap:cas-4.1.x grep '^domainPass' /etc/openldap/for_sysadmin.txt | cut -f 2 -d =)"
+	CAS_LDAP_PASS="$(docker run -i -t --rm rd-connect.eu/cas-ldap:cas-4.1.x grep '^domainPass' /etc/openldap/for_sysadmin.txt | cut -f 2 -d =)"
 	```
 	
 	4. Build RD-Connect CAS container:
@@ -175,15 +103,10 @@ Some of the next steps depend on described at [README-CA.md](README-CA.md).
 	docker build --build-arg="CAS_LDAP_PASS=${CAS_LDAP_PASS}" -t rd-connect.eu/rdconnect-umi:${UMI_TAG} umi_rd-connect
 	```
 	
-	3. We generate the data volumes needed by UMI:
+	3. We generate the umi_data_container based on centos:7 oficial image:
 	
 	```bash
-	# /var/log/httpd
-	docker volume create --name pla_logs
-	# /etc/openldap -> you can create a separate volume for it, or reuse ldap_conf data volume
-	docker volume create --name pla_ldap
-	# /etc/phpldapadmin
-	docker volume create --name pla_conf
+	docker create -v /var/log/httpd -v /etc/openldap -v /etc/phpldapadmin --name umi_data_container centos:7 /bin/true
 	docker cp blblblblblb umi_data_container:/etc/
 	```
 	
