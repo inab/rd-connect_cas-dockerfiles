@@ -74,4 +74,4 @@ RUN	sed -e '/<\/VirtualHost>/r /tmp/umi.conf' -e 'x;$G' -i /etc/httpd/conf.d/ssl
 RUN	yum autoremove -y git
 RUN	yum clean all
 
-VOLUME	[ "/home/rdconnect-rest/RDConnect-UserManagement-REST-API/configs"]
+VOLUME	[ "/home/rdconnect-rest/RDConnect-UserManagement-REST-API/configs" ]
