@@ -17,10 +17,7 @@ source "${dockerFileDir}"/declDataVolumes.sh.common
 
 echo "Using prefix '${prefix}' for data volumes"
 
-# Loop and print it.  Using offset and length to extract values
-for ((iVol=0; iVol<$numVolumes; iVol++)) ; do
-	#instanceName="${prefix}${!volumes[iVol]:0:1}"
-	volumeName="${prefix}${!volumes[iVol]:1:1}"
-	#mountPoint="${!volumes[iVol]:2:1}"
-	docker volume rm "${volumeName}"
-done
+docker_drop_volumes "${prefix}"
+
+echo "To create the data volumes again, run ./initDataVolumes.sh ${origPrefix}"
+echo "To populate the volumes, run ./populateDataVolumes.sh ${origPrefix}"

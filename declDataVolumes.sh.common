@@ -7,6 +7,7 @@ if [ $# -gt 0 ] ; then
 else
 	prefix="demo"
 fi
+origPrefix="${prefix}"
 
 # Adding a separator (if needed)
 if [ "$prefix" != "" ] ; then
@@ -154,10 +155,31 @@ docker_init_volumes() {
 	
 	# Loop and print it.  Using offset and length to extract values
 	for ((iVol=0; iVol<$numVolumes; iVol++)) ; do
-		#instanceName="${prefix}${!volumes[iVol]:0:1}"
-		local volumeName="${prefix}${!volumes[iVol]:1:1}"
-		#mountPoint="${!volumes[iVol]:2:1}"
+		# Bash 4.2 behaves strange on these
+		#local instanceName="${prefix}${!volumes[iVol]:0:1}"
+		#local volumeName="${prefix}${!volumes[iVol]:1:1}"
+		#local mountPoint="${!volumes[iVol]:2:1}"
+		# So these behave better
+		local -a volume=( "${!volumes[iVol]}" )
+		local volumeName="${prefix}${volume[1]}"
 		docker volume create --name "${volumeName}"
+	done
+}
+
+docker_drop_volumes() {
+	local prefix="$1"
+	local iVol
+	
+	# Loop and print it.  Using offset and length to extract values
+	for ((iVol=0; iVol<$numVolumes; iVol++)) ; do
+		# Bash 4.2 behaves strange on these
+		#local instanceName="${prefix}${!volumes[iVol]:0:1}"
+		#local volumeName="${prefix}${!volumes[iVol]:1:1}"
+		#local mountPoint="${!volumes[iVol]:2:1}"
+		# So these behave better
+		local -a volume=( "${!volumes[iVol]}" )
+		local volumeName="${prefix}${volume[1]}"
+		docker volume rm "${volumeName}"
 	done
 }
 
@@ -177,10 +199,11 @@ docker_create() {
 	
 	local -a volDecl
 	for ((iVol=0; iVol<$numVolumes; iVol++)) ; do
-		local instanceName="${!volumes[iVol]:0:1}"
+		local -a volume=( "${!volumes[iVol]}" )
+		local instanceName="${volume[0]}"
 		if [ "$instanceName" = "$instance" ] ; then
-			local volumeName="${prefix}${!volumes[iVol]:1:1}"
-			local mountPoint="${!volumes[iVol]:2:1}"
+			local volumeName="${prefix}${volume[1]}"
+			local mountPoint="${volume[2]}"
 			volDecl+=( -v "${volumeName}:${mountPoint}" )
 		fi
 	#	volumeName="${prefix}${!volumes[iVol]:1:1}"
@@ -192,9 +215,10 @@ docker_create() {
 	
 	local -a linkDecl
 	for ((iLink=0; iLink<$numLinks; iLink++)) ; do
-		local instanceName="${!links[iLink]:0:1}"
+		local -a link=( "${!links[iLink]}" )
+		local instanceName="${link[0]}"
 		if [ "$instanceName" = "$instance" ] ; then
-			destName="${!links[iLink]:1:1}"
+			destName="${link[1]}"
 			hostName="${hostnames[$destName]}"
 			linkDecl+=( --link "${prefix}${destName}:${hostName}" )
 		fi
