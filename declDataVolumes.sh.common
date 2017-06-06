@@ -73,6 +73,21 @@ docker_remove_instances() {
 }
 
 
+docker_save_images() {
+	local archiveFile="$1"
+	
+	local instance
+	local -a imageList
+	#for instance in "${!images[@]}" ; do
+	for instance in "${instances[@]}" ; do
+		imageList+=( "${images[$instance]}" )
+		#echo "key  : $instance"
+		#echo "value: ${images[$instance]}"
+	done
+	docker save -o "${archiveFile}" "${imageList[@]}"
+}
+
+
 declare -A hostnames=(
 	["casldap"]="ldap.rd-connect.eu"
 	["cas"]="rdconnectcas.rd-connect.eu"
