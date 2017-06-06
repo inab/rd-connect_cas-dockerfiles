@@ -47,6 +47,6 @@ echo "* RD-Connect CAS is available at https://127.0.0.1:$HOST_CASPORT/cas/login
 echo "* RD-Connect UMI is available at https://127.0.0.1:$HOST_UMIPORT/user-management/"
 echo "* RD-Connect phpLDAPadmin is available at https://127.0.0.1:$HOST_PLAPORT/phpldapadmin/"
 echo
-echo "To start the instances, run ./startInstances.sh ${prefix}"
-echo "To remove the instances, run ./removeInstances.sh ${prefix}"
-echo "To drop the data volumes, run ./dropDataVolumes.sh ${prefix}"
+echo "To start the instances, run ./startInstances.sh ${origPrefix}"
+echo "To remove the instances, run ./removeInstances.sh ${origPrefix}"
+echo "To drop the data volumes, run ./dropDataVolumes.sh ${origPrefix}"
