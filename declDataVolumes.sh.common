@@ -183,6 +183,27 @@ docker_drop_volumes() {
 	done
 }
 
+docker_populate_volumes() {
+	local prefix="$1"
+	local tvol="$2"
+	local iVol
+
+	for ((iVol=0; iVol<$numVolumes; iVol++)) ; do
+		local -a volume=( "${!volumes[iVol]}" )
+		local origInstanceName="${volume[0]}"
+		local instanceName="${prefix}${origInstanceName}"
+		local volumeName="${prefix}${volume[1]}"
+		local mountPoint="${volume[2]}"
+		local imageName="${images[$origInstanceName]}"
+	
+		# This is to be sure the volume does exist
+		docker volume create --name "${volumeName}"
+		#docker run --rm -v "${volumeName}":"${tvol}" "$imageName" /bin/bash -c "ls /"
+		#docker run --rm -v "${volumeName}":"${tvol}" "$imageName" /bin/bash -c "cp -aT '${mountPoint}' '${tvol}' && chown '--reference=${mountPoint}' '${tvol}' && chmod '--reference=${mountPoint}' '${tvol}' && ls -la '${tvol}'"
+		docker run --rm -v "${volumeName}":"${tvol}" "$imageName" /bin/bash -c "cp -aT '${mountPoint}' '${tvol}' && chown '--reference=${mountPoint}' '${tvol}' && chmod '--reference=${mountPoint}' '${tvol}'"
+	done
+}
+
 docker_create() {
 	local prefix="$1"
 	local instance="$2"
