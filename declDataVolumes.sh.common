@@ -32,6 +32,7 @@ declare -A images=(
 docker_start_instances() {
 	local prefix="$1"
 	
+	local instance
 	local -a prefixInstances
 	#for instance in "${!images[@]}" ; do
 	for instance in "${instances[@]}" ; do
@@ -45,6 +46,7 @@ docker_start_instances() {
 docker_stop_instances() {
 	local prefix="$1"
 	
+	local instance
 	local -a prefixInstances
 	#for instance in "${!images[@]}" ; do
 	for instance in "${instances[@]}" ; do
@@ -58,6 +60,7 @@ docker_stop_instances() {
 docker_remove_instances() {
 	local prefix="$1"
 	
+	local instance
 	local -a prefixInstances
 	#for instance in "${!images[@]}" ; do
 	for instance in "${instances[@]}" ; do
@@ -145,11 +148,25 @@ numLinks=${#links[@]}
 #	echo "mountpoint ${mountPoint}"
 #done
 
+docker_init_volumes() {
+	local prefix="$1"
+	local iVol
+	
+	# Loop and print it.  Using offset and length to extract values
+	for ((iVol=0; iVol<$numVolumes; iVol++)) ; do
+		#instanceName="${prefix}${!volumes[iVol]:0:1}"
+		local volumeName="${prefix}${!volumes[iVol]:1:1}"
+		#mountPoint="${!volumes[iVol]:2:1}"
+		docker volume create --name "${volumeName}"
+	done
+}
+
 docker_create() {
 	local prefix="$1"
 	local instance="$2"
 	local hostPort
 	local instancePort
+	local iVol
 	
 	local -a portDecl
 	if [ $# -ge 4 ] ; then
