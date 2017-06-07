@@ -8,8 +8,6 @@ LABEL	Description="RD-Connect User Management Interface" Vendor="CNIO"
 
 ARG	USERMANAGEMENT_BRANCH=ldap
 ARG	USERMANAGEMENT_CHECKOUT=9ba94da2ef3d64b44cac5225b2b2beaae48a09c6
-ARG	UMI_BRANCH=master
-ARG	UMI_CHECKOUT=442241a8bd3f37332b3de31a0629fd5e826c4fc6
 
 ARG	CAS_SERVER_URL=https://rdconnectcas.rd-connect.eu:9443/cas
 ARG	LDAP_SERVER=ldap.rd-connect.eu
@@ -33,14 +31,16 @@ RUN	cd rd-connect-user-management && cp -dpr configs user-management.cgi user-ma
 RUN	sed -i "s/^.*ldap_host=.*/ldap_host=${LDAP_SERVER}/; s/^.*ldap_user=.*/ldap_user=${CAS_LDAP_USER}/; s/^.*ldap_pass=.*/ldap_pass=${CAS_LDAP_PASS}/; s#^cas_url=.*#cas_url=${CAS_SERVER_URL}#;" RDConnect-UserManagement-REST-API/configs/user-management.ini
 
 ENV	UMI_CLONE=${HOME}/user-management-interface
+ARG	UMI_BRANCH=master
+ARG	UMI_CHECKOUT=5023689900ab42f60b73a4a7711f7086c8d91700
 
 RUN	git clone -b "${UMI_BRANCH}" https://github.com/inab/rd-connect-user-management-interface.git "${UMI_CLONE}" && \
 	cd "${UMI_CLONE}" && \
 	git checkout "${UMI_CHECKOUT}"
 WORKDIR ${UMI_CLONE}
 RUN	npm install
-RUN	PATH="${UMI_CLONE}/node_modules/.bin:$PATH" gulp build
-RUN	mkdir -p "$HOME/DOCUMENT_ROOT" && cp -dpTr build "$HOME/DOCUMENT_ROOT/user-management"
+RUN	PATH="${UMI_CLONE}/node_modules/.bin:$PATH" gulp build && test -f build/js/app.js
+RUN	mkdir -p "$HOME/DOCUMENT_ROOT" && cp -dpTr "${UMI_CLONE}"/build "$HOME/DOCUMENT_ROOT/user-management"
 
 # The SELinux part
 #RUN	chmod go+rx "$HOME" && \
@@ -48,6 +48,9 @@ RUN	mkdir -p "$HOME/DOCUMENT_ROOT" && cp -dpTr build "$HOME/DOCUMENT_ROOT/user-m
 #	chcon -Rv --type=httpd_sys_content_t "$HOME"/rd-connect-user-management && \
 #	chcon -Rv --type=httpd_sys_content_t "$HOME"/RDConnect-UserManagement-REST-API && \
 #	chcon -Rv --type=httpd_sys_script_exec_t "$HOME"/RDConnect-UserManagement-REST-API/user-management.cgi
+
+# Cleaning up, user level
+RUN	rm -rf "${UMI_CLONE}" "${HOME}"/.npm
 
 USER	root
 ENV	HOME=/root
@@ -70,7 +73,7 @@ RUN	sed -e '/<\/VirtualHost>/r /tmp/umi.conf' -e 'x;$G' -i /etc/httpd/conf.d/ssl
 # Enabling the API as such
 
 
-# Cleaning up
+# Cleaning up, root level
 RUN	yum autoremove -y git
 RUN	yum clean all
 

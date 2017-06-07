@@ -2,7 +2,7 @@ FROM	rd-connect.eu/httpd:2.4
 MAINTAINER	Andrés Cañada Pallarés <acanada@cnio.es>, José María Fernández <jmfernandez@cnio.es>
 LABEL	Description="RD-Connect User Management Interface prerequisites" Vendor="CNIO"
 
-ARG	NODE_VERSION=4.8.0
+ARG	NODE_VERSION=4.8.3
 ARG	UMI_SERVER=rdconnect-umi.rd-connect.eu
 
 ARG	HTTPD_CERTS_FILE=/tmp/cas-httpd-certs.tar
@@ -38,7 +38,7 @@ RUN 	cd /tmp && \
 	tar xf node-v${NODE_VERSION}.tar.xz && \
 	cd node-v${NODE_VERSION} && \
 	./configure && \
-	make && \
+	make -j 4 && \
 	make install && \
 	rm -rf /tmp/node-v*
 
