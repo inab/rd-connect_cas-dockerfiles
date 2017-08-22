@@ -65,17 +65,17 @@ RUN	git clone --recurse-submodules https://github.com/pwm-project/pwm.git "${PWM
 
 # Basic PWM setup before compilation
 RUN	install -D -o tomcat -g tomcat -m 755 -d "${PWM_APPLICATION_PATH}" && \
-	sed -i "s#>unspecified<#>${PWM_APPLICATION_PATH}<#" "${PWM_CLONE}"/src/main/webapp/WEB-INF/web.xml
+	sed -i "s#>unspecified<#>${PWM_APPLICATION_PATH}<#" "${PWM_CLONE}"/server/src/main/webapp/WEB-INF/web.xml
 
 # Compiling PWM
 RUN	cd "${PWM_CLONE}" && PATH="$MAVEN_HOME/bin:$PATH" mvn clean package
 
 # Installing PWM
-RUN	chown tomcat: "${PWM_CLONE}"/target/pwm-*.war && cp -p "${PWM_CLONE}"/target/pwm-*.war /var/lib/tomcat7/webapps/pwm.war
+RUN	chown tomcat: "${PWM_CLONE}"/server/target/pwm-*.war && cp -p "${PWM_CLONE}"/server/target/pwm-*.war /var/lib/tomcat7/webapps/pwm.war
 
 
 # Last, cleanup!!
-RUN	rm -rf "${MAVEN_HOME}"* /tmp/phantomjs /tmp/npm* ~/.m2
+RUN	rm -rf "${MAVEN_HOME}"* /tmp/phantomjs /tmp/npm* ~/.m2 ~/.npm
 RUN	rm -rf "${CASCLONE}" "${CAS_MGMT_CLONE}" "${PWM_CLONE}" "${LOCAL_CAS_TOMCAT_CERTS_DIR}"
 RUN	yum autoremove -y git ant ant-contrib apg
 RUN	yum clean all
