@@ -284,10 +284,9 @@ backup_cas_vm() {
 		
 		echo "$mountPoint" >> "$tmplistfile".dup
 	done
-	sort -u "$tmplistfile".dup > "$tmplistfile"
-	echo "$tmplistfile"
-	exit 1
+	sort -u "$tmplistfile".dup > "$tmplistfile".sorted
 	
-	scp "$tmplistfile" root@"$servername":"$tmplistfile"
-	ssh root@"$servername" "tar --selinux --acls --xattrs -z -c -C / -p -T '$tmplistfile' -f - " > "$destfile"
+	scp "$tmplistfile".sorted root@"$servername":"$tmplistfile"
+	rm -f "$tmplistfile".dup "$tmplistfile".sorted
+	ssh root@"$servername" "tar --selinux --acls --xattrs -z -c -C / -p -T '$tmplistfile' -f - && rm -f '$tmplistfile'" > "$destfile"
 }
