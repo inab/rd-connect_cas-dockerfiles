@@ -42,9 +42,9 @@ RUN	npm install
 RUN	PATH="${UMI_CLONE}/node_modules/.bin:$PATH" gulp build && test -f build/js/app.js
 RUN	mkdir -p "$HOME/DOCUMENT_ROOT" && cp -dpTr "${UMI_CLONE}"/build "$HOME/DOCUMENT_ROOT/user-management"
 
+RUN	chmod go+rx "$HOME"
 # The SELinux part
-#RUN	chmod go+rx "$HOME" && \
-#	chcon -Rv --type=httpd_sys_content_t "$HOME"/DOCUMENT_ROOT && \
+#RUN	chcon -Rv --type=httpd_sys_content_t "$HOME"/DOCUMENT_ROOT && \
 #	chcon -Rv --type=httpd_sys_content_t "$HOME"/rd-connect-user-management && \
 #	chcon -Rv --type=httpd_sys_content_t "$HOME"/RDConnect-UserManagement-REST-API && \
 #	chcon -Rv --type=httpd_sys_script_exec_t "$HOME"/RDConnect-UserManagement-REST-API/user-management.cgi
@@ -56,7 +56,7 @@ USER	root
 ENV	HOME=/root
 WORKDIR	${HOME}
 
-RUN	yum --enablerepo=epel install -y httpd-itk
+#RUN	yum --enablerepo=epel install -y httpd-itk
 #RUN	yum install -y checkpolicy policycoreutils-python && \
 #	setsebool -P httpd_enable_cgi=1 && \
 #	setsebool -P httpd_read_user_content=1 && \
@@ -66,7 +66,7 @@ RUN	yum --enablerepo=epel install -y httpd-itk
 #	checkmodule -M -m -o rdconnect-user-management.mod /home/rdconnect-rest/rd-connect-user-management/selinux/rdconnect-user-management.te && \
 #	semodule_package -o rdconnect-user-management.pp -m rdconnect-user-management.mod && \
 #	semodule -i rdconnect-user-management.pp
-RUN	sed -i 's/^#\(LoadModule \)/\1/' /etc/httpd/conf.modules.d/00-mpm-itk.conf
+#RUN	sed -i 's/^#\(LoadModule \)/\1/' /etc/httpd/conf.modules.d/00-mpm-itk.conf
 COPY	umi.conf /tmp
 RUN	sed -e '/<\/VirtualHost>/r /tmp/umi.conf' -e 'x;$G' -i /etc/httpd/conf.d/ssl.conf && rm /tmp/umi.conf
 

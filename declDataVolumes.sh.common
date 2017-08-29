@@ -194,7 +194,9 @@ docker_drop_volumes() {
 		# So these behave better
 		local -a volume=( "${!volumes[iVol]}" )
 		local volumeName="${prefix}${volume[1]}"
-		docker volume rm "${volumeName}"
+		
+		# This is needed to drop pending volumes
+		docker volume rm "${volumeName}" || true
 	done
 }
 
