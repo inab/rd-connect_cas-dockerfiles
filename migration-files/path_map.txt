@@ -1,0 +1,15 @@
+/etc/openldap	slapd.d	ldap_conf
+/var/lib/ldap	*	ldap_db
+/var/log	slapd.log	ldap_logs
+/etc/cas	cas.properties	cas_conf
+#	tomcat_conf
+/var/log	tomcat7,cas		cas_logs
+/etc/cas/pwm-data	*	pwm_state
+#	pla_conf
+#	pla_ldap
+#	pla_pki
+/var/log	httpd	pla_logs
+/home/rdconnect-rest/RDConnect-UserManagement-REST-API/configs	*.ini*	umi_conf
+#	umi_ldap
+#	umi_pki
+/var/log	httpd	umi_logs

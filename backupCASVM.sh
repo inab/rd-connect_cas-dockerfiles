@@ -20,12 +20,14 @@ source "${dockerFileDir}"/declDataVolumes.sh.common
 if [ $# -ge 1 ] ; then
 	cas_hostname="$1"
 	if [ $# -ge 2 ] ; then
-		destfile="$2"
+		backupArchive="$2"
 	else
-		destfile="cas-backup-$(date -Is).tar.gz"
+		backupArchive="cas-backup-$(date -Is).tar.gz"
 	fi
 	
-	backup_cas_vm "$cas_hostname" "$destfile"
+	backup_cas_vm "$cas_hostname" "$backupArchive"
+	
+	echo "To migrate this backup, run ./migrateBackupToVolumes.sh {prefix} ${backupArchive}"
 
 	#echo "To drop the data volumes, run ./dropDataVolumes.sh ${origPrefix}"
 	#echo "To create the instances, run ./createInstances.sh ${origPrefix}"

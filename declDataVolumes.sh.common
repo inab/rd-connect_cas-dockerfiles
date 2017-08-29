@@ -219,6 +219,78 @@ docker_populate_volumes() {
 	done
 }
 
+# This is an improved version of docker_populate_volumes, as it merges contents from a VM backup archive
+docker_migrate_volumes() {
+	local prefix="$1"
+	local backupArchive="$2"
+	local mappingsFile="$3"
+	local tvol="$4"
+	local iVol
+
+	local remBackArch="/tmp/backupArchive.tar.gz"
+	for ((iVol=0; iVol<$numVolumes; iVol++)) ; do
+		local -a volume=( "${!volumes[iVol]}" )
+		local origInstanceName="${volume[0]}"
+		local instanceName="${prefix}${origInstanceName}"
+		local origVolumeName="${volume[1]}"
+		local volumeName="${prefix}${origVolumeName}"
+		local mountPoint="${volume[2]}"
+		local imageName="${images[$origInstanceName]}"
+	
+		# This is to be sure the volume does exist
+		docker volume create --name "${volumeName}"
+		#docker run --rm -v "${volumeName}":"${tvol}" "$imageName" /bin/bash -c "ls /"
+		#docker run --rm -v "${volumeName}":"${tvol}" "$imageName" /bin/bash -c "cp -aT '${mountPoint}' '${tvol}' && chown '--reference=${mountPoint}' '${tvol}' && chmod '--reference=${mountPoint}' '${tvol}' && ls -la '${tvol}'"
+		docker run --rm -v "${volumeName}":"${tvol}" "$imageName" \
+			/bin/bash -c "cp -aT '${mountPoint}' '${tvol}' && chown '--reference=${mountPoint}' '${tvol}' && chmod '--reference=${mountPoint}' '${tvol}'"
+		
+		local path
+		local filters
+		local migVolumeName
+		grep -v "^#" "${mappingsFile}" | grep -P "\t${origVolumeName}$" | while read path filters migVolumeName ; do
+			# Removing the leading slash
+			case "$path" in
+				/*)
+					path="${path:1}"
+					;;
+			esac
+			
+			# Setting up the strip-components
+			local stripComp
+			if [ -n "${path}" ] ; then
+				stripComp="--strip-components=$(tr '/' '\n' <<< "${path}" | wc -l)"
+			fi
+			
+			local -a filtersArr
+			IFS=',' read -ra filtersArr <<< "${filters}"
+			# Setting up the filtering conditions
+			local -a compPaths=( )
+			local filter
+			for filter in "${filtersArr[@]}" ; do
+				local newPath
+				if [ -n "${path}" -o -n "${filter}" ] ; then
+					if [ -z "${filter}" -o "${filter}" = '*' ] ; then
+						newPath="${path}"
+					elif [ -z "${path}" ] ; then
+						newPath="${filter}"
+					else
+						newPath="${path}/${filter}"
+					fi
+				fi
+				
+				if [ -n "${newPath}" ] ; then
+					compPaths=( "'${newPath}'" "${compPaths[@]}" )
+				fi
+			done
+			
+			if [ "${#compPaths[@]}" -gt 0 ] ; then
+				docker run --rm -v "${volumeName}":"${tvol}" -v "${backupArchive}":"${remBackArch}" "$imageName" \
+					/bin/bash -c "tar --acls --xattrs -z -x -C '${tvol}' $stripComp -p -f '${remBackArch}' ${compPaths[@]}"
+			fi
+		done
+	done
+}
+
 docker_create() {
 	local prefix="$1"
 	local instance="$2"
