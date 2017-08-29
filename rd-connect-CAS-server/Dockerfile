@@ -14,7 +14,7 @@ RUN	cd /tmp && \
 	tar xzf apache-maven-${MAVEN_VERSION}-bin.tar.gz
 
 ARG	CAS_TAG=cas-4.1.x
-ARG	CAS_RELEASE=23b48851c7a2e84ed8c0e413c0f6c87991bc5545
+ARG	CAS_RELEASE=e8f756dc805919f1450f6f6c40bbe72498485a62
 ENV	CASCLONE=/tmp/ldap-cas-${CAS_RELEASE}
 ARG	CAS_CERTS_PROFILE=cas-tomcat
 ARG	CAS_TOMCAT_CERTS_FILE=/tmp/cas-tomcat-certs.tar

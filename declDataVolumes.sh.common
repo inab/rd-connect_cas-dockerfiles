@@ -224,7 +224,8 @@ docker_migrate_volumes() {
 	local prefix="$1"
 	local backupArchive="$2"
 	local mappingsFile="$3"
-	local tvol="$4"
+	local transfersFile="$4"
+	local tvol="$5"
 	local iVol
 
 	local remBackArch="/tmp/backupArchive.tar.gz"
@@ -244,6 +245,7 @@ docker_migrate_volumes() {
 		docker run --rm -v "${volumeName}":"${tvol}" "$imageName" \
 			/bin/bash -c "cp -aT '${mountPoint}' '${tvol}' && chown '--reference=${mountPoint}' '${tvol}' && chmod '--reference=${mountPoint}' '${tvol}'"
 		
+		# Copying files
 		local path
 		local filters
 		local migVolumeName
@@ -287,6 +289,46 @@ docker_migrate_volumes() {
 				docker run --rm -v "${volumeName}":"${tvol}" -v "${backupArchive}":"${remBackArch}" "$imageName" \
 					/bin/bash -c "tar --acls --xattrs -z -x -C '${tvol}' $stripComp -p -f '${remBackArch}' ${compPaths[@]}"
 			fi
+		done
+		
+		# Transferring properties
+		local transVolumeName
+		local fileToTransfer
+		local propertiesToTransfer
+		grep -v "^#" "${transfersFile}" | grep -P "^${origVolumeName}\t" | while read transVolumeName path fileToTransfer propertiesToTransfer ; do
+			# Removing the leading slash
+			case "$path" in
+				/*)
+					path="${path:1}"
+					;;
+			esac
+			
+			# Setting up the strip-components
+			local stripComp
+			if [ -n "${path}" ] ; then
+				stripComp="--strip-components=$(tr '/' '\n' <<< "${path}" | wc -l)"
+			fi
+			
+			local -a propsArr
+			IFS=',' read -ra propsArr <<< "${propertiesToTransfer}"
+			# Setting up the extraction path
+			local extractionPath
+			if [ -n "${path}" -a -n "${fileToTransfer}" ] ; then
+				extractionPath="${path}/${fileToTransfer}"
+			fi
+			
+			# Getting the lines with the values
+			local extFile="/tmp/mig_${RANDOM}_$(date +%s).file"
+			tar -z -x -O -f "${backupArchive}" "${extractionPath}" > "${extFile}"
+			for prop in "${propsArr[@]}" ; do
+				local propLine="$(grep "^${prop}=" "${extFile}")"
+				if [ -n "$propLine" ] ; then
+					# And applying the values
+					docker run --rm -v "${volumeName}":"${tvol}" "$imageName" \
+						/bin/bash -c "sed -i 's#^${prop}=.*\$#${propLine}#' '${tvol}/${fileToTransfer}'"
+				fi
+			done
+			rm -f "${extFile}"
 		done
 	done
 }

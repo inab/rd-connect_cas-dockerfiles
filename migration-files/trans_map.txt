@@ -1,0 +1,1 @@
+cas_conf	/etc/cas	cas.properties	ldap.managerPassword
