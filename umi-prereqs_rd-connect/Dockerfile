@@ -1,8 +1,8 @@
 FROM	rd-connect.eu/httpd:2.4
-MAINTAINER	Andrés Cañada Pallarés <acanada@cnio.es>, José María Fernández <jmfernandez@cnio.es>
-LABEL	Description="RD-Connect User Management Interface prerequisites" Vendor="CNIO"
+MAINTAINER	José María Fernández <jose.m.fernandez@bsc.es>
+LABEL	Description="RD-Connect User Management Interface prerequisites" Vendor="BSC-CNS"
 
-ARG	NODE_VERSION=4.8.3
+ARG	NODE_VERSION=4.8.4
 ARG	UMI_SERVER=rdconnect-umi.rd-connect.eu
 
 ARG	HTTPD_CERTS_FILE=/tmp/cas-httpd-certs.tar

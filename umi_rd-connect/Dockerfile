@@ -1,13 +1,13 @@
 FROM	rd-connect.eu/rdconnect-umi-prereqs:latest
-MAINTAINER	Andrés Cañada Pallarés <acanada@cnio.es>, José María Fernández <jmfernandez@cnio.es>
-LABEL	Description="RD-Connect User Management Interface" Vendor="CNIO"
+MAINTAINER	José María Fernández <jose.m.fernandez@bsc.es>
+LABEL	Description="RD-Connect User Management Interface" Vendor="BSC-CNS"
 
 #UMI_TAG=latest
 #mkdir -p "${PWD}"/umi_rd-connect/tmp
 
 
 ARG	USERMANAGEMENT_BRANCH=ldap
-ARG	USERMANAGEMENT_CHECKOUT=9ba94da2ef3d64b44cac5225b2b2beaae48a09c6
+ARG	USERMANAGEMENT_CHECKOUT=b40c52321c789dbc96430d607bb96d21065428e4
 
 ARG	CAS_SERVER_URL=https://rdconnectcas.rd-connect.eu:9443/cas
 ARG	LDAP_SERVER=ldap.rd-connect.eu
