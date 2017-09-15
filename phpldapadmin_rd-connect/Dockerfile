@@ -1,6 +1,5 @@
 FROM	rd-connect.eu/httpd:2.4
-MAINTAINER Andres Cañada <acanada@cnio.es>
-LABEL	Description="PHP base image for RD-Connect" Vendor="CNIO" Version="7"
+LABEL	description="PHP base image for RD-Connect" vendor="BSC-CNS" version="7" maintainer="José María Fernández <jose.m.fernandez@bsc.es>"
 
 ARG	LDAP_SERVER=ldap.rd-connect.eu
 ARG	PLA_SERVER=rdconnect-pla.rd-connect.eu

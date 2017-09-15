@@ -1,6 +1,5 @@
 FROM	rd-connect.eu/centos:7
-MAINTAINER Andres Cañada <acanada@cnio.es>
-LABEL	Description="Apache web server base image for RD-Connect" Vendor="CNIO" Version="2.4"
+LABEL	description="Apache web server base image for RD-Connect" vendor="BSC-CNS" version="2.4" maintainer="José María Fernández <jose.m.fernandez@bsc.es>"
 
 # This must be done BEFORE, so /etc/sysconfig/httpd file from CentOS is not overwritten
 RUN	cd /root/blfs-bootscripts && make install-httpd && \

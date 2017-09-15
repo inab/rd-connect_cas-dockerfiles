@@ -1,6 +1,5 @@
 FROM	rd-connect.eu/rdconnect-umi-prereqs:latest
-MAINTAINER	José María Fernández <jose.m.fernandez@bsc.es>
-LABEL	Description="RD-Connect User Management Interface" Vendor="BSC-CNS"
+LABEL	description="RD-Connect User Management Interface" vendor="BSC-CNS" maintainer="José María Fernández <jose.m.fernandez@bsc.es>"
 
 #UMI_TAG=latest
 #mkdir -p "${PWD}"/umi_rd-connect/tmp

@@ -1,8 +1,7 @@
 FROM	rd-connect.eu/centos:7
-MAINTAINER	José María Fernández <jmfernandez@cnio.es>
 
 # Use a single LABEL (multiple ones are discouraged because each one creates a new layer)
-LABEL	Description="RD-Connect commmon key generator" Vendor="CNIO" Version="0.3"
+LABEL	description="RD-Connect commmon key generator" vendor="BSC-CNS" version="0.3" maintainer="José María Fernández <jose.m.fernandez@bsc.es>"
 
 ENV	RDCONNECT_KEYSTORE_DIR=/etc/rd-connect_keystore
 ENV	RDCONNECT_CASOFT_DIR_REL=rd-connect_ca

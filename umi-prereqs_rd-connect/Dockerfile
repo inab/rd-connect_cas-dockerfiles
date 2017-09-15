@@ -1,6 +1,5 @@
 FROM	rd-connect.eu/httpd:2.4
-MAINTAINER	José María Fernández <jose.m.fernandez@bsc.es>
-LABEL	Description="RD-Connect User Management Interface prerequisites" Vendor="BSC-CNS"
+LABEL	description="RD-Connect User Management Interface prerequisites" vendor="BSC-CNS" maintainer="José María Fernández <jose.m.fernandez@bsc.es>"
 
 ARG	NODE_VERSION=4.8.4
 ARG	UMI_SERVER=rdconnect-umi.rd-connect.eu

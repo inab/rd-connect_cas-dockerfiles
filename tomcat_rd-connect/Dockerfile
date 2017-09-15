@@ -1,10 +1,9 @@
 FROM	rd-connect.eu/openjdk:8
-MAINTAINER	José María Fernández <jmfernandez@cnio.es>
 
 # Use a single LABEL (multiple ones are discouraged because each one creates a new layer)
-LABEL	Description="Tomcat 7 layout for different RD-Connect CentOS based images" Vendor="CNIO" Version="7.0."
+LABEL	description="Tomcat 7 layout for different RD-Connect CentOS based images" vendor="BSC-CNS" version="7.0.81" maintainer="José María Fernández <jose.m.fernandez@bsc.es>"
 
-ARG	TOMCAT_TAG=7.0.75
+ARG	TOMCAT_TAG=7.0.81
 ENV	TOMCATCLONE=/tmp/tomcat-${TOMCAT_TAG}
 
 # Now, the steps needed to install RD-Connect CAS and CAS-Management

@@ -1,8 +1,7 @@
 FROM	rd-connect.eu/tomcat:7
-MAINTAINER	José María Fernández <jmfernandez@cnio.es>
 
 # Use a single LABEL (multiple ones are discouraged because each one creates a new layer)
-LABEL	Description="Server setup needed by RD-Connect CAS + CAS Management + PWM" Vendor="CNIO" Version="1.0"
+LABEL	description="Server setup needed by RD-Connect CAS + CAS Management + PWM" vendor="BSC-CNS" version="1.0" maintainer="José María Fernández <jose.m.fernandez@bsc.es>"
 
 # Now, the prerequisites needed to install RD-Connect CAS, CAS-Management and PWM
 RUN	yum install -y git java-devel ant ant-contrib apg

@@ -1,8 +1,7 @@
 FROM	rd-connect.eu/centos:7
-MAINTAINER	José María Fernández <jmfernandez@cnio.es>
 
 # Use a single LABEL (multiple ones are discouraged because each one creates a new layer)
-LABEL	Description="RD-Connect OpenLDAP setup" Vendor="CNIO" Version="1.0"
+LABEL	description="RD-Connect OpenLDAP setup" vendor="BSC-CNS" version="1.0" maintainer="José María Fernández <jose.m.fernandez@bsc.es>"
 
 ARG	CAS_RELEASE=23b48851c7a2e84ed8c0e413c0f6c87991bc5545
 ENV	CASCLONE=/tmp/ldap-cas-${CAS_RELEASE}
@@ -28,13 +27,13 @@ RUN	curl -o /tmp/openldap-centos.patch 'https://bugs.centos.org/file_download.ph
 ADD	"${CAS_LDAP_CERTS_FILE}" "${LOCAL_CAS_LDAP_CERTS_DIR}"
 RUN	git clone https://github.com/inab/ldap-rest-cas4-overlay.git "${CASCLONE}" && \
 	cd "${CASCLONE}" && \
-	git checkout "${CAS_RELEASE}" && \
-	/bin/bash -x "${CASCLONE}/ldap-schemas/setup-ldap.sh" "${LOCAL_CAS_LDAP_CERTS_DIR}" "${LDAP_CERTS_PROFILE}" "/etc/init.d/slapd start" '/etc/init.d/slapd stop' && \
-	rm -rf "${CASCLONE}" "${LOCAL_CAS_LDAP_CERTS_DIR}"
+	git checkout "${CAS_RELEASE}"
+RUN	/bin/bash -x "${CASCLONE}/ldap-schemas/setup-ldap.sh" "${LOCAL_CAS_LDAP_CERTS_DIR}" "${LDAP_CERTS_PROFILE}" "/etc/init.d/slapd start" '/etc/init.d/slapd stop'
 
 # Last, cleanup!!
-RUN	yum autoremove -y git patch
-RUN	yum clean all
+RUN	rm -rf "${CASCLONE}" "${LOCAL_CAS_LDAP_CERTS_DIR}" && \ 
+	yum autoremove -y git patch && \
+	yum clean all
 
 EXPOSE	389 636
 VOLUME	[ "/etc/openldap", "/var/lib/ldap", "/var/log" ]

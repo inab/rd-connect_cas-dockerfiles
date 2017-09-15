@@ -1,8 +1,7 @@
 FROM	nimmis/centos:7
-MAINTAINER	José María Fernández <jmfernandez@cnio.es>
 
 # Use a single LABEL (multiple ones are discouraged because each one creates a new layer)
-LABEL	Description="Common layout for different RD-Connect CentOS based images" Vendor="CNIO" Version="7"
+LABEL	description="Common layout for different RD-Connect CentOS based images" vendor="BSC-CNS" version="7" maintainer="José María Fernández <jose.m.fernandez@bsc.es>"
 
 # First, setup the timezone
 RUN	rm -f /etc/localtime && \
@@ -13,11 +12,11 @@ RUN	yum -y update || true
 RUN	yum -y install bzip2 make sysvinit-tools
 ENV	container docker
 
-ARG	LFS_BOOTSCRIPTS_VERSION=20150222
+ARG	LFS_BOOTSCRIPTS_VERSION=20170626
 ENV	LFS_BOOTSCRIPTS_REL=lfs-bootscripts-${LFS_BOOTSCRIPTS_VERSION}
 ENV	LFS_BOOTSCRIPTS_DIR=/tmp/${LFS_BOOTSCRIPTS_REL}
 ARG	LFS_BOOTSCRIPTS_URL=http://www.linuxfromscratch.org/lfs/downloads/stable/${LFS_BOOTSCRIPTS_REL}.tar.bz2
-ARG	BLFS_BOOTSCRIPTS_VERSION=20160902
+ARG	BLFS_BOOTSCRIPTS_VERSION=20170731
 ARG	BLFS_BOOTSCRIPTS_URL=http://anduin.linuxfromscratch.org/BLFS/blfs-bootscripts/blfs-bootscripts-${BLFS_BOOTSCRIPTS_VERSION}.tar.xz
 # First, LFS skeleton
 RUN	cd /tmp && wget "${LFS_BOOTSCRIPTS_URL}" && tar xf $(basename "${LFS_BOOTSCRIPTS_URL}") && cd "${LFS_BOOTSCRIPTS_DIR}" && make install && chmod -x /etc/init.d/* && cd /tmp && rm -rf "${LFS_BOOTSCRIPTS_DIR}" $(basename "${LFS_BOOTSCRIPTS_URL}")
