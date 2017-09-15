@@ -55,7 +55,7 @@ docker run --rm -v rd-connect_ca-vol:/etc/rd-connect_keystore rd-connect.eu/rd-c
 docker build -t rd-connect.eu/openjdk:8 openjdk_rd-connect
 
 # Dependency: Tomcat, image
-TOMCAT_TAG=7.0.75
+TOMCAT_TAG="$(grep -o 'version="[^"]\+"' tomcat_rd-connect/Dockerfile | cut -f 2 -d '"')"
 docker build --build-arg="TOMCAT_TAG=${TOMCAT_TAG}" -t rd-connect.eu/tomcat:${TOMCAT_TAG} -t rd-connect.eu/tomcat:7 tomcat_rd-connect
 
 # CAS+CAS Management image
