@@ -11,6 +11,8 @@ ENV	MAVEN_HOME=/tmp/apache-maven-${MAVEN_VERSION}
 RUN	cd /tmp && \
 	curl -O https://archive.apache.org/dist/maven/maven-3/${MAVEN_VERSION}/binaries/apache-maven-${MAVEN_VERSION}-bin.tar.gz && \
 	tar xzf apache-maven-${MAVEN_VERSION}-bin.tar.gz
+# This environment variable will mute the downloading lines
+ENV	MAVEN_OPTS="-Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn"
 
 ARG	CAS_TAG=cas-4.1.x
 ARG	CAS_RELEASE=e8f756dc805919f1450f6f6c40bbe72498485a62
@@ -26,7 +28,7 @@ RUN	git clone --recurse-submodules -b "${CAS_TAG}" https://github.com/inab/ldap-
 	cd "${CASCLONE}" && \
 	git checkout "${CAS_RELEASE}"
 # Compiling CAS
-RUN	cd "${CASCLONE}" && PATH="$MAVEN_HOME/bin:$PATH" mvn clean package
+RUN	cd "${CASCLONE}" && PATH="$MAVEN_HOME/bin:$PATH" mvn -B clean package
 
 ADD	"${CAS_TOMCAT_CERTS_FILE}" "${LOCAL_CAS_TOMCAT_CERTS_DIR}"
 
@@ -45,7 +47,7 @@ RUN	git clone --recurse-submodules -b "${CAS_TAG}" https://github.com/inab/cas4-
 	git checkout "${CAS_MGMT_RELEASE}"
 
 # Compiling CAS Management
-RUN	cd "${CAS_MGMT_CLONE}" && PATH="$MAVEN_HOME/bin:$PATH" mvn clean package
+RUN	cd "${CAS_MGMT_CLONE}" && PATH="$MAVEN_HOME/bin:$PATH" mvn -B clean package
 
 # Installing CAS Management
 RUN	install -D -o tomcat -g tomcat -m 644 "${CAS_MGMT_CLONE}"/etc/log4j2-cas-management.system.xml /etc/cas/log4j2-cas-management.xml
@@ -67,7 +69,7 @@ RUN	install -D -o tomcat -g tomcat -m 755 -d "${PWM_APPLICATION_PATH}" && \
 	sed -i "s#>unspecified<#>${PWM_APPLICATION_PATH}<#" "${PWM_CLONE}"/server/src/main/webapp/WEB-INF/web.xml
 
 # Compiling PWM
-RUN	cd "${PWM_CLONE}" && PATH="$MAVEN_HOME/bin:$PATH" mvn clean package
+RUN	cd "${PWM_CLONE}" && PATH="$MAVEN_HOME/bin:$PATH" mvn -B clean package
 
 # Installing PWM
 RUN	chown tomcat: "${PWM_CLONE}"/server/target/pwm-*.war && cp -p "${PWM_CLONE}"/server/target/pwm-*.war /var/lib/tomcat7/webapps/pwm.war
