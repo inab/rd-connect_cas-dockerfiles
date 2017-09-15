@@ -77,7 +77,7 @@ RUN	chown tomcat: "${PWM_CLONE}"/server/target/pwm-*.war && cp -p "${PWM_CLONE}"
 RUN	rm -rf "${MAVEN_HOME}"* /tmp/phantomjs /tmp/npm* ~/.m2 ~/.npm
 RUN	rm -rf "${CASCLONE}" "${CAS_MGMT_CLONE}" "${PWM_CLONE}" "${LOCAL_CAS_TOMCAT_CERTS_DIR}"
 RUN	yum autoremove -y git ant ant-contrib apg
-RUN	yum clean all
+RUN	yum clean all && rm -rf /var/cache/yum
 
 # There is a bug in Docker 1.12, where inherited volumes sometimes do not get the proper permissions
 RUN	chown -R tomcat: /etc/tomcat7

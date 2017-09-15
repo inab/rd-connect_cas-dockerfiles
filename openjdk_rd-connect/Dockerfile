@@ -4,4 +4,4 @@ FROM	rd-connect.eu/centos:7
 LABEL	description="OpenJDK 8 for different RD-Connect CentOS based images" vendor="BSC-CNS" version="8" maintainer="José María Fernández <jose.m.fernandez@bsc.es>"
 
 RUN	yum install -y java-1.8.0-openjdk-devel
-RUN	yum clean all
+RUN	yum clean all && rm -rf /var/cache/yum

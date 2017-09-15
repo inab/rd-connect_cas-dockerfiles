@@ -24,7 +24,7 @@ RUN	rm -rf "${TOMCATCLONE}"
 
 # Last, cleanup rpmdevtools and yum caches!!
 RUN	yum autoremove -y rpmdevtools
-RUN	yum clean all
+RUN	yum clean all && rm -rf /var/cache/yum
 
 # And with this, tomcat is initialized on container startup
 RUN	echo '[program:tomcat7]' > /etc/supervisord.d/tomcat7.conf && echo 'command=/my_initd_service tomcat7' >> /etc/supervisord.d/tomcat7.conf

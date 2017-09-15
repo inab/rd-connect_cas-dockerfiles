@@ -11,7 +11,7 @@ ENV	RDCONNECT_CERTS_OUT_DIR=/tmp/rd-connect_certs
 # We need these utilities for the packaged script
 RUN	yum install -y gnutls-utils
 # Last, cleanup!
-RUN	yum clean all
+RUN	yum clean all && rm -rf /var/cache/yum
 
 VOLUME	"${RDCONNECT_KEYSTORE_DIR}"
 ENTRYPOINT	[ "/usr/local/rd-connect_ca/rd-connect_getcert.bash" ]

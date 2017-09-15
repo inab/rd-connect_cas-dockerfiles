@@ -11,7 +11,7 @@ ENV	LOCAL_HTTPD_CERTS_DIR=/tmp/rd-connect_pla_certs
 RUN	yum update -y --setopt=tsflags=nodocs && \
 	yum install -y --setopt=tsflags=nodocs mod_php && \
 	yum install -y --setopt=tsflags=nodocs phpldapadmin && \
-	yum clean all
+	yum clean all && rm -rf /var/cache/yum
 
 # Setting up the CA certificate and server certificates (very important!)
 ADD	"${HTTPD_CERTS_FILE}" "${LOCAL_HTTPD_CERTS_DIR}"

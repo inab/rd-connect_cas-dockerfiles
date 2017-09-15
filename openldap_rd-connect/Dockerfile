@@ -33,7 +33,7 @@ RUN	/bin/bash -x "${CASCLONE}/ldap-schemas/setup-ldap.sh" "${LOCAL_CAS_LDAP_CERT
 # Last, cleanup!!
 RUN	rm -rf "${CASCLONE}" "${LOCAL_CAS_LDAP_CERTS_DIR}" && \ 
 	yum autoremove -y git patch && \
-	yum clean all
+	yum clean all && rm -rf /var/cache/yum
 
 EXPOSE	389 636
 VOLUME	[ "/etc/openldap", "/var/lib/ldap", "/var/log" ]
