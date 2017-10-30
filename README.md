@@ -117,7 +117,7 @@ Some of the next steps depend on described at [README-CA.md](README-CA.md).
 	docker build --build-arg="TOMCAT_TAG=${TOMCAT_TAG}" -t rd-connect.eu/tomcat:${TOMCAT_TAG} -t rd-connect.eu/tomcat:7 tomcat_rd-connect
 	# For /etc/cas
 	docker volume create --name cas_conf
-	# For /etc/tomcat7
+	# For /etc/tomcat8
 	docker volume create --name tomcat_conf
 	# For /var/log
 	docker volume create --name cas_logs

@@ -1,4 +1,4 @@
-FROM	rd-connect.eu/tomcat:7
+FROM	rd-connect.eu/tomcat:8
 
 # Use a single LABEL (multiple ones are discouraged because each one creates a new layer)
 LABEL	description="Server setup needed by RD-Connect CAS + CAS Management + PWM" vendor="BSC-CNS" version="1.0" maintainer="José María Fernández <jose.m.fernandez@bsc.es>"
@@ -34,8 +34,8 @@ ADD	"${CAS_TOMCAT_CERTS_FILE}" "${LOCAL_CAS_TOMCAT_CERTS_DIR}"
 
 
 # Installing CAS
-RUN	PATH="$MAVEN_HOME/bin:$PATH" /bin/bash -x "${CASCLONE}/etc/setup-tomcat.sh" "${LOCAL_CAS_TOMCAT_CERTS_DIR}" "${CAS_CERTS_PROFILE}" "${CAS_LDAP_PASS}" '/etc/sysconfig/tomcat7'
-RUN	chown tomcat: "${CASCLONE}"/target/cas.war && cp -p "${CASCLONE}"/target/cas.war /var/lib/tomcat7/webapps
+RUN	PATH="$MAVEN_HOME/bin:$PATH" /bin/bash -x "${CASCLONE}/etc/setup-tomcat.sh" "${LOCAL_CAS_TOMCAT_CERTS_DIR}" "${CAS_CERTS_PROFILE}" "${CAS_LDAP_PASS}" '/etc/sysconfig/tomcat8'
+RUN	chown tomcat: "${CASCLONE}"/target/cas.war && cp -p "${CASCLONE}"/target/cas.war /var/lib/tomcat8/webapps
 
 # Now, CAS Management
 ARG	CAS_MGMT_RELEASE=03c0194e38f124335a70814f22ad852cff8abcb2
@@ -51,7 +51,7 @@ RUN	cd "${CAS_MGMT_CLONE}" && PATH="$MAVEN_HOME/bin:$PATH" mvn -B clean package
 
 # Installing CAS Management
 RUN	install -D -o tomcat -g tomcat -m 644 "${CAS_MGMT_CLONE}"/etc/log4j2-cas-management.system.xml /etc/cas/log4j2-cas-management.xml
-RUN	chown tomcat: "${CAS_MGMT_CLONE}"/target/cas-management.war && cp -p "${CAS_MGMT_CLONE}"/target/cas-management.war /var/lib/tomcat7/webapps
+RUN	chown tomcat: "${CAS_MGMT_CLONE}"/target/cas-management.war && cp -p "${CAS_MGMT_CLONE}"/target/cas-management.war /var/lib/tomcat8/webapps
 
 
 # And now, PWM
@@ -72,7 +72,7 @@ RUN	install -D -o tomcat -g tomcat -m 755 -d "${PWM_APPLICATION_PATH}" && \
 RUN	cd "${PWM_CLONE}" && PATH="$MAVEN_HOME/bin:$PATH" mvn -B clean package
 
 # Installing PWM
-RUN	chown tomcat: "${PWM_CLONE}"/server/target/pwm-*.war && cp -p "${PWM_CLONE}"/server/target/pwm-*.war /var/lib/tomcat7/webapps/pwm.war
+RUN	chown tomcat: "${PWM_CLONE}"/server/target/pwm-*.war && cp -p "${PWM_CLONE}"/server/target/pwm-*.war /var/lib/tomcat8/webapps/pwm.war
 
 
 # Last, cleanup!!
@@ -82,8 +82,8 @@ RUN	yum autoremove -y git ant ant-contrib apg
 RUN	yum clean all && rm -rf /var/cache/yum
 
 # There is a bug in Docker 1.12, where inherited volumes sometimes do not get the proper permissions
-RUN	chown -R tomcat: /etc/tomcat7
+RUN	chown -R tomcat: /etc/tomcat8
 
 # This must be the last sentence, otherwise we are losing all the setups!!!
 EXPOSE	9443
-VOLUME	[ "/etc/cas", "/etc/tomcat7", "/var/lib/pwm", "/var/log/cas" ]
+VOLUME	[ "/etc/cas", "/etc/tomcat8", "/var/lib/pwm", "/var/log/cas" ]

@@ -104,7 +104,7 @@ declare -a CASLDAPlogs=( "casldap"	"ldap_logs"	"/var/log" )
 
 # CAS
 declare -a CASconf=( "cas"	"cas_conf"	"/etc/cas" )
-declare -a CASTOMCATconf=( "cas"	"tomcat_conf"	"/etc/tomcat7" )
+declare -a CASTOMCATconf=( "cas"	"tomcat_conf"	"/etc/tomcat8" )
 declare -a CASlogs=( "cas"	"cas_logs"	"/var/log" )
 declare -a PWMstate=( "cas"	"pwm_state"	"/var/lib/pwm" )
 

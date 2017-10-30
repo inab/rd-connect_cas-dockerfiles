@@ -16,7 +16,7 @@ services:
     image: "rd-connect.eu/rdconnect_cas:cas-4.1.x"
     volumes:
        - cas_conf:/etc/cas
-       - tomcat_conf:/etc/tomcat7
+       - tomcat_conf:/etc/tomcat8
        - cas_logs:/var/log
        - pwm_state:/var/lib/pwm
     ports:

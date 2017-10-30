@@ -33,7 +33,7 @@ domainPass="$(grep '^domainPass' "$tempF" | cut -f 2 -d =)"
 rm -f "${tempF}"
 
 tempF="$("$tempfileCMD")"
-docker cp "${prefix}"cas:/etc/tomcat7/tomcat-users.xml "$tempF"
+docker cp "${prefix}"cas:/etc/tomcat8/tomcat-users.xml "$tempF"
 tomcatUser="$(grep '<user .*manager-gui' "$tempF" | grep -o "name='[^']*'" | cut -f 2 -d "'")"
 tomcatPass="$(grep '<user .*manager-gui' "$tempF" | grep -o "password='[^']*'" | cut -f 2 -d "'")"
 rm -f "${tempF}"

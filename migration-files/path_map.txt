@@ -4,7 +4,7 @@
 # Only some properties must be copied
 #	/etc/cas	cas.properties	cas_conf
 #	tomcat_conf
-/var/log	tomcat7,cas		cas_logs
+/var/log	tomcat7,tomcat8,cas		cas_logs
 /etc/cas/pwm-data	*	pwm_state
 #	pla_conf
 #	pla_ldap
