@@ -1,7 +1,7 @@
 FROM	rd-connect.eu/httpd:2.4
 LABEL	description="RD-Connect User Management Interface prerequisites" vendor="BSC-CNS" maintainer="José María Fernández <jose.m.fernandez@bsc.es>"
 
-ARG	NODE_VERSION=4.8.4
+ARG	NODE_VERSION=8.11.4
 ARG	UMI_SERVER=rdconnect-umi.rd-connect.eu
 
 ARG	HTTPD_CERTS_FILE=/tmp/cas-httpd-certs.tar

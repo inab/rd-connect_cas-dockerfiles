@@ -37,7 +37,7 @@ RUN	git clone -b "${UMI_BRANCH}" https://github.com/inab/rd-connect-user-managem
 	cd "${UMI_CLONE}" && \
 	git checkout "${UMI_CHECKOUT}"
 WORKDIR ${UMI_CLONE}
-RUN	npm install
+RUN	npm install --no-save
 RUN	PATH="${UMI_CLONE}/node_modules/.bin:$PATH" gulp build && test -f build/js/app.js
 RUN	mkdir -p "$HOME/DOCUMENT_ROOT" && cp -dpTr "${UMI_CLONE}"/build "$HOME/DOCUMENT_ROOT/user-management"
 
