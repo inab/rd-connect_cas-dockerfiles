@@ -8,12 +8,11 @@ RUN	rm -f /etc/localtime && \
 	ln -s ../usr/share/zoneinfo/Europe/Madrid /etc/localtime
 
 # As we are inheriting from nimmis init system, which could be outdated, we update the system packages first
-RUN	yum -y install deltarpm
-RUN	yum -y update || true
-RUN	yum -y install bzip2 make sysvinit-tools
+RUN	yum -y install deltarpm && yum -y update || true && yum -y install bzip2 make sysvinit-tools
+
 ENV	container docker
 
-ARG	LFS_VERSION=8.1
+ARG	LFS_VERSION=8.3
 ARG	LFS_BOOTSCRIPTS_URL=http://www.linuxfromscratch.org/lfs/downloads/${LFS_VERSION}/
 ARG	BLFS_BOOTSCRIPTS_URL=http://www.linuxfromscratch.org/blfs/downloads/${LFS_VERSION}/
 
