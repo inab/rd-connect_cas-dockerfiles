@@ -14,4 +14,4 @@ RUN	yum -y --setopt=tsflags=nodocs update && \
 
 VOLUME	[ "/var/log/httpd" ]
 
-EXPOSE	443
+EXPOSE	80 443
