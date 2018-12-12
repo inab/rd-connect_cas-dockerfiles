@@ -39,11 +39,22 @@ echo "Adding RD-Connect public key"
 #cp -p "${CAcert}" "${resDir}"
 ln -s "${CAcert}" "${resDir}"
 
-if [ $# -gt 0 ]; then
+declare -a certs
+# Has it been called from a CGI environment?
+if [ -n "$PATH_INFO" ] ; then
+	IFS='/' read -r -a certs <<< "$PATH_INFO"
+elif [ $# -gt 0 ]; then
+	certs=( "$@" )
+fi
+
+if [ "${#certs[@]}" -gt 0 ] ; then
 	# We want it to exit on first error
 	set -e
 	
-	for cert in "$@" ; do
+	for cert in "${certs[@]}" ; do
+		if [ -z "$cert" ] ; then
+			continue
+		fi
 		certtemplate="${templatedir}/${cert}.cfg"
 		if [ ! -f "${certtemplate}" ] ; then
 			echo "[ERROR] Template for certificate '${cert}' does not exist at '${certtemplate}'"
@@ -86,4 +97,11 @@ fi
 
 # We assure reproducibility with this sentence
 touch --date=@0 "$resDir"
+
+# Now, CGI output (if needed)
+if [ -n "$PATH_INFO" ] ; then
+	echo "Content-type: application/x-tar" 1>&6
+	echo 1>&6
+fi
+
 tar -c -h -C "${resDir}" -f - . 1>&6
