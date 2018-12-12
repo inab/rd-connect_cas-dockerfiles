@@ -1,5 +1,22 @@
-version: '2'
+version: '3'
 services:
+  # Service to generate and share public/private certificates
+  init-ca:
+    domainname: ca.rd-connect.eu
+    hostname: ca
+    build: ./rd-connect-common-key-generator
+    image: "rd-connect.eu/rd-connect_ca:0.4"
+    # Disable the default entrypoint
+    entrypoint: [ ]
+    # This service should be alive only for initialization purposes
+    command: ["timeout","-t","60","/usr/sbin/lighttpd", "-D", "-f", "/etc/lighttpd/lighttpd.conf"]
+  # Service to interchange generated credentials (mainly LDAP ones)
+  init-cred-broker:
+    domainname: cred-broker.rd-connect.eu
+    hostname: cred-broker
+    image: "redis/5-alpine"
+    # This service should be alive only for initialization purposes
+    command: ["timeout","-t","60","redis-server"]
   casldap:
     domainname: ldap.rd-connect.eu
     hostname: ldap
