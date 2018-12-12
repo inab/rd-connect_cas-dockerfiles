@@ -5,24 +5,26 @@ services:
     domainname: ca.rd-connect.eu
     hostname: ca
     build: ./rd-connect-common-key-generator
-    image: "rd-connect.eu/rd-connect_ca:0.4"
+    image: "${DOMAIN}/init_ca:0.4"
     # Disable the default entrypoint
     entrypoint: [ ]
     # This service should be alive only for initialization purposes
     command: ["timeout","-t","60","/usr/sbin/lighttpd", "-D", "-f", "/etc/lighttpd/lighttpd.conf"]
+  
   # Service to interchange generated credentials (mainly LDAP ones)
   init-cred-broker:
-    domainname: cred-broker.rd-connect.eu
+    domainname: cred-broker.${DOMAIN}
     hostname: cred-broker
     image: "redis/5-alpine"
     # This service should be alive only for initialization purposes
     command: ["timeout","-t","60","redis-server"]
     expose:
        - "6379"
+  
   casldap:
-    domainname: ldap.rd-connect.eu
+    domainname: ldap.${DOMAIN}
     hostname: ldap
-    image: "rd-connect.eu/cas-ldap:cas-4.1.x"
+    image: "${DOMAIN}/cas-ldap:cas-4.1.x"
     volumes:
        - ldap_conf:/etc/openldap
        - ldap_db:/var/lib/ldap
@@ -30,9 +32,9 @@ services:
   cas:
     depends_on:
        - casldap
-    domainname: rdconnectcas.rd-connect.eu
+    domainname: rdconnectcas.${DOMAIN}
     hostname: rdconnectcas
-    image: "rd-connect.eu/rdconnect_cas:cas-4.1.x"
+    image: "${DOMAIN}/rdconnect_cas:cas-4.1.x"
     volumes:
        - cas_conf:/etc/cas
        - tomcat_conf:/etc/tomcat8
@@ -43,9 +45,9 @@ services:
   pla:
     depends_on:
        - casldap
-    domainname: rdconnect-pla.rd-connect.eu
+    domainname: rdconnect-pla.${DOMAIN}
     hostname: rdconnect-pla
-    image: "rd-connect.eu/phpldapadmin:latest"
+    image: "${DOMAIN}/phpldapadmin:latest"
     volumes:
        - pla_conf:/etc/phpldapadmin
        - pla_ldap:/etc/openldap
@@ -57,9 +59,9 @@ services:
     depends_on:
       - casldap
       - cas
-    domainname: rdconnect-umi.rd-connect.eu
+    domainname: rdconnect-umi.${DOMAIN}
     hostname: rdconnect-umi
-    image: "rd-connect.eu/rdconnect-umi:latest"
+    image: "${DOMAIN}/rdconnect-umi:latest"
     volumes:
        - umi_conf:/home/rdconnect-rest/RDConnect-UserManagement-REST-API/configs
        - umi_ldap:/etc/openldap
