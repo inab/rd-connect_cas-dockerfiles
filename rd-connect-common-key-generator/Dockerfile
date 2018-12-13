@@ -17,7 +17,7 @@ RUN	apk add --update gnutls-utils openssl bash lighttpd && \
 	mkdir -p "${RDCONNECT_KEYSTORE_DIR}" && \
 	chown lighttpd: "${RDCONNECT_KEYSTORE_DIR}" && \
 	chmod go= "${RDCONNECT_KEYSTORE_DIR}"
-VOLUME	"${RDCONNECT_KEYSTORE_DIR}"
+VOLUME	[ "${RDCONNECT_KEYSTORE_DIR}" ]
 
 EXPOSE	80
 ENTRYPOINT	[ "su","-","lighttpd","-c","/usr/local/rd-connect_ca/rd-connect_getcert.bash" ]
