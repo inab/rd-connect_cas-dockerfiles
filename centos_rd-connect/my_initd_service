@@ -119,7 +119,7 @@ def stop_child_process(name, pid, signo = signal.SIGTERM, time_limit = KILL_PROC
 #
 
 def signal_handler(signal, frame):
-	return_code = subprocess.call("service "+sys.argv[1]+" stop", shell=True)
+	return_code = subprocess.call("/etc/init.d/"+sys.argv[1]+" stop", shell=True)
 	sys.exit(0)
 
 signal.signal(signal.SIGINT, signal_handler)
