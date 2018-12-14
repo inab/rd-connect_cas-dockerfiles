@@ -1,1 +1,0 @@
-centos_rd-connect/Dockerfile
