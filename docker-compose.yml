@@ -2,52 +2,82 @@ version: '3'
 services:
   # Service to generate and share public/private certificates
   init-ca:
-    domainname: ca.rd-connect.eu
+    domainname: ${DOMAIN}
     hostname: ca
     build: ./rd-connect-common-key-generator
     image: "${DOMAIN}/init_ca:0.4"
     # Disable the default entrypoint
     entrypoint: [ ]
     # This service should be alive only for initialization purposes
-    command: ["timeout","-t","60","/usr/sbin/lighttpd", "-D", "-f", "/etc/lighttpd/lighttpd.conf"]
+    command: ["timeout","-t","180","/usr/sbin/lighttpd", "-D", "-f", "/etc/lighttpd/lighttpd.conf"]
+    volumes:
+       - init_ca_keystore:/etc/rd-connect_keystore
   
   # Service to interchange generated credentials (mainly LDAP ones)
   init-cred-broker:
-    domainname: cred-broker.${DOMAIN}
+    domainname: ${DOMAIN}
     hostname: cred-broker
-    image: "redis/5-alpine"
+    image: "redis:5-alpine"
     # This service should be alive only for initialization purposes
-    command: ["timeout","-t","60","redis-server"]
-    expose:
-       - "6379"
+    command: ["timeout","-t","180","redis-server"]
+  
+  init-lfs-centos:
+    build: ./centos_rd-connect
+    image: "${DOMAIN}/centos:7"
+    command: [ "/bin/true" ]
+  
+  init-httpd-centos:
+    build: ./httpd_rd-connect
+    image: "${DOMAIN}/httpd:2.4"
+    depends_on:
+       - init-lfs-centos
+    command: [ "/bin/true" ]
   
   casldap:
-    domainname: ldap.${DOMAIN}
+    domainname: ${DOMAIN}
     hostname: ldap
+    build: ./openldap_rd-connect
     image: "${DOMAIN}/cas-ldap:cas-4.1.x"
+    depends_on:
+       - init-lfs-centos
+    links:
+       - init-ca:ca.${DOMAIN}
+       - init-cred-broker:cred-broker.${DOMAIN}
+    environment:
+       - CA_BROKER=ca.${DOMAIN}
+       - CRED_BROKER=cred-broker.${DOMAIN}
     volumes:
        - ldap_conf:/etc/openldap
        - ldap_db:/var/lib/ldap
        - ldap_logs:/var/log
-  cas:
-    depends_on:
-       - casldap
-    domainname: rdconnectcas.${DOMAIN}
-    hostname: rdconnectcas
-    image: "${DOMAIN}/rdconnect_cas:cas-4.1.x"
-    volumes:
-       - cas_conf:/etc/cas
-       - tomcat_conf:/etc/tomcat8
-       - cas_logs:/var/log
-       - pwm_state:/var/lib/pwm
-    ports:
-       - "9443:9443"
+#  cas:
+#    depends_on:
+#       - casldap
+#    domainname: rdconnectcas.${DOMAIN}
+#    hostname: rdconnectcas
+#    image: "${DOMAIN}/rdconnect_cas:cas-4.1.x"
+#    volumes:
+#       - cas_conf:/etc/cas
+#       - tomcat_conf:/etc/tomcat8
+#       - cas_logs:/var/log
+#       - pwm_state:/var/lib/pwm
+#    ports:
+#       - "9443:9443"
   pla:
-    depends_on:
-       - casldap
-    domainname: rdconnect-pla.${DOMAIN}
+    domainname: ${DOMAIN}
     hostname: rdconnect-pla
-    image: "${DOMAIN}/phpldapadmin:latest"
+    build: ./phpldapadmin_rd-connect
+    image: "${DOMAIN}/phpldapadmin:1.2.3"
+    depends_on:
+       - init-httpd-centos
+    links:
+       - init-ca:ca.${DOMAIN}
+       - casldap:ldap.${DOMAIN}
+    environment:
+       - CA_BROKER=ca.${DOMAIN}
+       - CRED_BROKER=cred-broker.${DOMAIN}
+       - LDAP_SERVER=ldap.${DOMAIN}
+       - PLA_SERVER=rdconnect-pla.${DOMAIN}
     volumes:
        - pla_conf:/etc/phpldapadmin
        - pla_ldap:/etc/openldap
@@ -55,33 +85,35 @@ services:
        - pla_logs:/var/log/httpd
     ports:
       - "9444:443"
-  umi:
-    depends_on:
-      - casldap
-      - cas
-    domainname: rdconnect-umi.${DOMAIN}
-    hostname: rdconnect-umi
-    image: "${DOMAIN}/rdconnect-umi:latest"
-    volumes:
-       - umi_conf:/home/rdconnect-rest/RDConnect-UserManagement-REST-API/configs
-       - umi_ldap:/etc/openldap
-       - umi_pki:/etc/pki/tls
-       - umi_logs:/var/log/httpd
-    ports:
-      - "9445:443"
+#  umi:
+#    depends_on:
+#      - casldap
+#      - cas
+#    domainname: rdconnect-umi.${DOMAIN}
+#    hostname: rdconnect-umi
+#    image: "${DOMAIN}/rdconnect-umi:latest"
+#    volumes:
+#       - umi_conf:/home/rdconnect-rest/RDConnect-UserManagement-REST-API/configs
+#       - umi_ldap:/etc/openldap
+#       - umi_pki:/etc/pki/tls
+#       - umi_logs:/var/log/httpd
+#    ports:
+#      - "9445:443"
 volumes:
+  init_ca_keystore:
   ldap_conf:
   ldap_db:
   ldap_logs:
-  cas_conf:
-  tomcat_conf:
-  cas_logs:
-  pwm_state:
+#  cas_conf:
+#  tomcat_conf:
+#  cas_logs:
+#  pwm_state:
   pla_conf:
   pla_ldap:
   pla_pki:
   pla_logs:
-  umi_conf:
-  umi_ldap:
-  umi_pki:
-  umi_logs:
+#  umi_conf:
+#  umi_ldap:
+#  umi_pki:
+#  umi_logs:
+#
