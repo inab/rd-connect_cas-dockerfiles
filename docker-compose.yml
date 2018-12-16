@@ -32,6 +32,20 @@ services:
     depends_on:
        - init-lfs-centos
     command: [ "/bin/true" ]
+
+  init-openjdk-centos:
+    build: ./openjdk_rd-connect
+    image: "${DOMAIN}/openjdk:8"
+    depends_on:
+       - init-lfs-centos
+    command: [ "/bin/true" ]
+  
+  init-tomcat-centos:
+    build: ./tomcat_rd-connect
+    image: "${DOMAIN}/tomcat:8"
+    depends_on:
+       - init-openjdk-centos
+    command: [ "/bin/true" ]
   
   casldap:
     domainname: ${DOMAIN}
@@ -50,19 +64,27 @@ services:
        - ldap_conf:/etc/openldap
        - ldap_db:/var/lib/ldap
        - ldap_logs:/var/log
-#  cas:
-#    depends_on:
-#       - casldap
-#    domainname: rdconnectcas.${DOMAIN}
-#    hostname: rdconnectcas
-#    image: "${DOMAIN}/rdconnect_cas:cas-4.1.x"
-#    volumes:
-#       - cas_conf:/etc/cas
-#       - tomcat_conf:/etc/tomcat8
-#       - cas_logs:/var/log
-#       - pwm_state:/var/lib/pwm
-#    ports:
-#       - "9443:9443"
+  cas:
+    domainname: ${DOMAIN}
+    hostname: rdconnectcas
+    build: ./cas-server_rd-connect
+    image: "${DOMAIN}/rdconnect_cas:cas-4.1.x"
+    depends_on:
+       - init-tomcat-centos
+    links:
+       - init-ca:ca.${DOMAIN}
+       - init-cred-broker:cred-broker.${DOMAIN}
+       - casldap:ldap.${DOMAIN}
+    environment:
+       - CA_BROKER=ca.${DOMAIN}
+       - CRED_BROKER=cred-broker.${DOMAIN}
+       - LDAP_SERVER=ldap.${DOMAIN}
+    volumes:
+       - cas_conf:/etc/cas
+       - tomcat_conf:/etc/tomcat8
+       - cas_logs:/var/log
+    ports:
+       - "9443:9443"
   pla:
     domainname: ${DOMAIN}
     hostname: rdconnect-pla
@@ -104,10 +126,9 @@ volumes:
   ldap_conf:
   ldap_db:
   ldap_logs:
-#  cas_conf:
-#  tomcat_conf:
-#  cas_logs:
-#  pwm_state:
+  cas_conf:
+  tomcat_conf:
+  cas_logs:
   pla_conf:
   pla_ldap:
   pla_pki:
