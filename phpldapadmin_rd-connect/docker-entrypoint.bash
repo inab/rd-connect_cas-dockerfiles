@@ -2,7 +2,7 @@
 
 # Directory where the certificates are going to be initially saved
 LOCAL_HTTPD_CERTS_DIR=/tmp/rd-connect_pla_certs
-# Sub-directory with the LDAP certificates
+# Sub-directory with the PHPLDAPAdmin certificates
 HTTPD_CERTS_PROFILE=cas-pla
 # The certification authority's public key
 CA_CERT=/etc/openldap/certs/cacert.pem
