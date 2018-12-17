@@ -6,7 +6,7 @@ LABEL	description="Server setup needed by RD-Connect CAS + CAS Management" vendo
 # Arguments for the build script
 ARG	CAS_TAG=cas-4.1.x
 ARG	CAS_RELEASE=45bcffc9c4767abbef42c1400f657e820a9663cd
-ARG	CAS_MGMT_RELEASE=03c0194e38f124335a70814f22ad852cff8abcb2
+ARG	CAS_MGMT_RELEASE=c477050b237e9eb1e7644e2cf381ebdc20513a7d
 
 # Adding and running the build script
 ADD	docker-build.bash /tmp
