@@ -15,6 +15,8 @@ if [ "$prefix" != "" ] ; then
 fi
 
 declare -a instances=(
+	"init-ca"
+	"init-cred-broker"
 	"casldap"
 	"cas"
 	"pla"
@@ -23,10 +25,12 @@ declare -a instances=(
 
 # Format: docker instance name, docker image
 declare -A images=(
-	["casldap"]="rd-connect.eu/cas-ldap:cas-4.1.x"
-	["cas"]="rd-connect.eu/rdconnect_cas:cas-4.1.x"
-	["pla"]="rd-connect.eu/phpldapadmin:latest"
-	["umi"]="rd-connect.eu/rdconnect-umi:latest"
+	["init-ca"]="${DOMAIN}/init_ca:0.4"
+	["init-cred-broker"]="redis:5-alpine"
+	["casldap"]="${DOMAIN}/cas-ldap:cas-4.1.x"
+	["cas"]="${DOMAIN}/rdconnect_cas:cas-4.1.x"
+	["pla"]="${DOMAIN}/phpldapadmin:1.2.3"
+	["umi"]="${DOMAIN}/rdconnect-umi:latest"
 )
 
 
@@ -89,13 +93,18 @@ docker_save_images() {
 
 
 declare -A hostnames=(
-	["casldap"]="ldap.rd-connect.eu"
-	["cas"]="rdconnectcas.rd-connect.eu"
-	["pla"]="rdconnect-pla.rd-connect.eu"
-	["umi"]="rdconnect-umi.rd-connect.eu"
+	["init-ca"]="ca.${DOMAIN}"
+	["init-cred-broker"]="cred-broker.${DOMAIN}"
+	["casldap"]="ldap.${DOMAIN}"
+	["cas"]="rdconnectcas.${DOMAIN}"
+	["pla"]="rdconnect-pla.${DOMAIN}"
+	["umi"]="rdconnect-umi.${DOMAIN}"
 )
 
 # Format: docker image , docker volume , mountpoint in the docker image
+
+# Init CA
+declare -a InitCAKeyStore=( "init-ca" "init_ca_keystore" "/etc/rd-connect_keystore" )
 
 # LDAP
 declare -a CASLDAPconf=( "casldap"	"ldap_conf"	"/etc/openldap" )
@@ -121,6 +130,7 @@ declare -a UMIpki=( "umi"	"umi_pki"	"/etc/pki/tls" )
 declare -a UMIlogs=( "umi"	"umi_logs"	"/var/log/httpd" )
 
 declare -a volumes=(
+	InitCAKeyStore[@]
 	CASLDAPconf[@]
 	CASLDAPdb[@]
 	CASLDAPlogs[@]
@@ -140,16 +150,30 @@ declare -a volumes=(
 
 numVolumes=${#volumes[@]}
 
+declare -a casldap_init_ca=( "casldap" "init-ca" )
+declare -a casldap_init_cred_broker=( "casldap" "init-cred-broker" )
 declare -a cas_casldap=( "cas"	"casldap" )
+declare -a cas_init_ca=( "cas" "init-ca" )
+declare -a cas_init_cred_broker=( "cas" "init-cred-broker" )
 declare -a pla_casldap=( "pla"	"casldap" )
+declare -a pla_init_ca=( "cas" "init-ca" )
 declare -a umi_casldap=( "umi"	"casldap" )
 declare -a umi_cas=( "umi"	"cas" )
+declare -a umi_init_ca=( "umi" "init-ca" )
+declare -a umi_init_cred_broker=( "umi" "init-cred-broker" )
 
 declare -a links=(
+	casldap_init_ca[@]
+	casldap_init_cred_broker[@]
 	cas_casldap[@]
+	cas_init_ca[@]
+	cas_init_cred_broker[@]
 	pla_casldap[@]
+	pla_init_ca[@]
 	umi_casldap[@]
 	umi_cas[@]
+	umi_init_ca[@]
+	umi_init_cred_broker[@]
 )
 
 numLinks=${#links[@]}

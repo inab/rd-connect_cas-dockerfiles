@@ -107,20 +107,31 @@ services:
        - pla_logs:/var/log/httpd
     ports:
       - "9444:443"
-#  umi:
-#    depends_on:
-#      - casldap
-#      - cas
-#    domainname: rdconnect-umi.${DOMAIN}
-#    hostname: rdconnect-umi
-#    image: "${DOMAIN}/rdconnect-umi:latest"
-#    volumes:
-#       - umi_conf:/home/rdconnect-rest/RDConnect-UserManagement-REST-API/configs
-#       - umi_ldap:/etc/openldap
-#       - umi_pki:/etc/pki/tls
-#       - umi_logs:/var/log/httpd
-#    ports:
-#      - "9445:443"
+  umi:
+    domainname: ${DOMAIN}
+    hostname: rdconnect-umi
+    build: ./umi_rd-connect
+    image: "${DOMAIN}/rdconnect-umi:latest"
+    depends_on:
+       - init-httpd-centos
+    links:
+       - init-ca:ca.${DOMAIN}
+       - init-cred-broker:cred-broker.${DOMAIN}
+       - casldap:ldap.${DOMAIN}
+       - cas:rdconnectcas.${DOMAIN}
+    environment:
+       - CA_BROKER=ca.${DOMAIN}
+       - CRED_BROKER=cred-broker.${DOMAIN}
+       - LDAP_SERVER=ldap.${DOMAIN}
+       - CAS_SERVER=rdconnectcas.${DOMAIN}
+       - CAS_PORT=9443
+    volumes:
+       - umi_conf:/home/rdconnect-rest/RDConnect-UserManagement-REST-API/configs
+       - umi_ldap:/etc/openldap
+       - umi_pki:/etc/pki/tls
+       - umi_logs:/var/log/httpd
+    ports:
+      - "9445:443"
 volumes:
   init_ca_keystore:
   ldap_conf:
@@ -133,8 +144,7 @@ volumes:
   pla_ldap:
   pla_pki:
   pla_logs:
-#  umi_conf:
-#  umi_ldap:
-#  umi_pki:
-#  umi_logs:
-#
+  umi_conf:
+  umi_ldap:
+  umi_pki:
+  umi_logs:
