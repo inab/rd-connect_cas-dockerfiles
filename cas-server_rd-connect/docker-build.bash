@@ -1,8 +1,8 @@
-#!/bin/bash
+ #!/bin/bash
 
 set -e
 
-MAVEN_VERSION=3.6.0
+TGCBRANCH=json-web-key-generator-0.3
 
 if [ $# -ge 3 ] ; then
 	CAS_TAG="$1"
@@ -12,27 +12,20 @@ if [ $# -ge 3 ] ; then
 	# Now, the prerequisites needed to install RD-Connect CAS and CAS-Management
 	yum install -y git java-devel ant ant-contrib apg redis
 	
-	# Some environmental setup
-	MAVEN_MAJOR_VERSION="${MAVEN_VERSION%%.*}"
-	export MAVEN_HOME=/tmp/apache-maven-${MAVEN_VERSION}
-	PATH="$MAVEN_HOME/bin:$PATH"
-	# This environment variable will mute the downloading lines
-	export MAVEN_OPTS="-Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn"
-	cd /tmp
-	curl -O https://archive.apache.org/dist/maven/maven-${MAVEN_MAJOR_VERSION}/${MAVEN_VERSION}/binaries/apache-maven-${MAVEN_VERSION}-bin.tar.gz
-	tar xzf apache-maven-${MAVEN_VERSION}-bin.tar.gz
-
 	CASCLONE=/tmp/cas-repo
+	TGCCLONE=/tmp/tgc-repo
 	
 	# Checking out CAS
-	git clone --recurse-submodules -b "${CAS_TAG}" https://github.com/inab/rd-connect-cas-overlay.git "${CASCLONE}"
+	git clone -b "${CAS_TAG}" https://github.com/inab/rd-connect-cas-overlay.git "${CASCLONE}"
 	cd "${CASCLONE}"
 	git checkout "${CAS_RELEASE}"
 	# Compiling CAS
-	mvn -B clean package
+	./mvnw -B clean package
+	
 	# Compiling TGC (for CAS install script)
-	cd "${CASCLONE}"/json-web-key-generator
-	mvn -B clean package
+	git clone -b "${TGCBRANCH}" https://github.com/mitreid-connect/json-web-key-generator.git "${TGCCLONE}"
+	cd "${TGCCLONE}"
+	"${CASCLONE}"/mvnw -B clean package
 
 	# Installing CAS
 	chown tomcat: "${CASCLONE}"/target/cas.war && cp -p "${CASCLONE}"/target/cas.war /var/lib/tomcat8/webapps
@@ -42,15 +35,14 @@ if [ $# -ge 3 ] ; then
 	CAS_MGMT_CLONE=/tmp/cas-mgmt-repo
 
 	# Checking out CAS Management
-	git clone --recurse-submodules -b "${CAS_TAG}" https://github.com/inab/cas4-management-overlay.git "${CAS_MGMT_CLONE}"
+	git clone --recurse-submodules -b "${CAS_TAG}" https://github.com/inab/rd-connect-cas-management-overlay.git "${CAS_MGMT_CLONE}"
 	cd "${CAS_MGMT_CLONE}"
 	git checkout "${CAS_MGMT_RELEASE}"
 
 	# Compiling CAS Management
-	mvn -B clean package
+	./mvnw -B clean package
 
 	# Installing CAS Management
-	install -D -o tomcat -g tomcat -m 644 "${CAS_MGMT_CLONE}"/etc/log4j2-cas-management.system.xml /etc/cas/log4j2-cas-management.xml
 	chown tomcat: "${CAS_MGMT_CLONE}"/target/cas-management.war
 	cp -p "${CAS_MGMT_CLONE}"/target/cas-management.war /var/lib/tomcat8/webapps
 
@@ -78,10 +70,10 @@ if [ $# -ge 3 ] ; then
 
 	# Last, cleanup!!
 	# We cannot remove the CAS checked out repository, as it must be used in the first use
-	for repo in "${CASCLONE}" ; do
-		cd "$repo" && mvn -B clean
+	for repo in "${CASCLONE}" "${CAS_MGMT_CLONE}" ; do
+		cd "$repo" && ./mvnw -B clean
 	done
-	rm -rf "${CAS_MGMT_CLONE}" "${MAVEN_HOME}"* /tmp/phantomjs /tmp/npm* ~/.m2 ~/.npm
+	rm -rf /tmp/phantomjs /tmp/npm* ~/.m2 ~/.npm
 	yum autoremove -y git ant ant-contrib
 	yum clean all && rm -rf /var/cache/yum
 

@@ -19,7 +19,7 @@ RUN	curl -o /tmp/openldap-centos.patch 'https://bugs.centos.org/file_download.ph
 	rm -f /tmp/openldap-centos.patch
 
 # This is needed, in order to get runtime setup working
-ARG	CAS_RELEASE=45bcffc9c4767abbef42c1400f657e820a9663cd
+ARG	CAS_RELEASE=48a63ecedb0929aa79813fd5d5a1ca90951360ba
 ENV	CASCLONE=/tmp/ldap-cas-${CAS_RELEASE}
 
 RUN	git clone https://github.com/inab/rd-connect-cas-overlay.git "${CASCLONE}" && \

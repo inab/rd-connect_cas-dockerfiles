@@ -4,9 +4,9 @@ FROM	rd-connect.eu/tomcat:8
 LABEL	description="Server setup needed by RD-Connect CAS + CAS Management" vendor="BSC-CNS" version="1.0" maintainer="José María Fernández <jose.m.fernandez@bsc.es>"
 
 # Arguments for the build script
-ARG	CAS_TAG=cas-4.1.x
-ARG	CAS_RELEASE=45bcffc9c4767abbef42c1400f657e820a9663cd
-ARG	CAS_MGMT_RELEASE=c477050b237e9eb1e7644e2cf381ebdc20513a7d
+ARG	CAS_TAG=cas-5.3.x
+ARG	CAS_RELEASE=2a8ab72e9f45c08adb4dc8d908f122f78b52a16b
+ARG	CAS_MGMT_RELEASE=6f1da90bb40f6ce8c546d0878fc8f49de6f7568c
 
 # Adding and running the build script
 ADD	docker-build.bash /tmp

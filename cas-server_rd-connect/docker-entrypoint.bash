@@ -6,7 +6,7 @@ LOCAL_CAS_TOMCAT_CERTS_DIR=/tmp/rd-connect_cas_tomcat_certs
 CAS_CERTS_PROFILE=cas-tomcat
 
 set -e
-if [ ! -f "/etc/cas/cas.properties" ] ; then
+if [ ! -f "/etc/cas/config/cas.properties" ] ; then
 	echo "Initializing CAS + CAS Management"
 	
 	# Saving the standard output and standard error
@@ -39,16 +39,16 @@ if [ ! -f "/etc/cas/cas.properties" ] ; then
 	fi
 	
 	# Third, initialize Tomcat+CAS installation
-	/bin/bash -x "/tmp/cas-repo/etc/setup-cas-tomcat.sh" "${LOCAL_CAS_TOMCAT_CERTS_DIR}" "${CAS_CERTS_PROFILE}" "${CAS_LDAP_PASS}" '/etc/sysconfig/tomcat8'
+	/bin/bash -x "/tmp/cas-repo/etc/setup-cas-tomcat.sh" "${LOCAL_CAS_TOMCAT_CERTS_DIR}" "${CAS_CERTS_PROFILE}" "${CAS_LDAP_PASS}" '/etc/sysconfig/tomcat8' /tmp/tgc-repo/target/json-web-key-generator-*-jar-with-dependencies.jar
 	
 	# Fourth, initialize CAS Management installation
-	#install -D -o tomcat -g tomcat -m 644 /tmp/cas-mgmt-repo/etc/log4j2-cas-management.system.xml /etc/cas/log4j2-cas-management.xml
+	/bin/bash -x "/tmp/cas-mgmt-repo/etc/setup-cas-management.sh" "${CAS_LDAP_PASS}"
 	
 	# Doing some certificates cleanup
 	rm -rf "${LOCAL_HTTPD_CERTS_DIR}"*
 	
 	# And removing the repos, as they are not needed any more
-	#rm -rf /tmp/cas-*
+	#rm -rf /tmp/cas-* /tmp/tgc-*
 	
 	# Restoring the standard output and standard error
 	exec 2>&7 1>&6

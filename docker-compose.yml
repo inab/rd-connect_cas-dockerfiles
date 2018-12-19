@@ -51,7 +51,7 @@ services:
     domainname: ${DOMAIN}
     hostname: ldap
     build: ./openldap_rd-connect
-    image: "${DOMAIN}/cas-ldap:cas-4.1.x"
+    image: "${DOMAIN}/cas-ldap:cas-5.3.x"
     depends_on:
        - init-lfs-centos
     links:
@@ -68,7 +68,7 @@ services:
     domainname: ${DOMAIN}
     hostname: rdconnectcas
     build: ./cas-server_rd-connect
-    image: "${DOMAIN}/rdconnect_cas:cas-4.1.x"
+    image: "${DOMAIN}/rdconnect_cas:cas-5.3.x"
     depends_on:
        - init-tomcat-centos
     links:

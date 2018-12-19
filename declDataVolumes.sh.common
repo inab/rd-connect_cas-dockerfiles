@@ -27,8 +27,8 @@ declare -a instances=(
 declare -A images=(
 	["init-ca"]="${DOMAIN}/init_ca:0.4"
 	["init-cred-broker"]="redis:5-alpine"
-	["casldap"]="${DOMAIN}/cas-ldap:cas-4.1.x"
-	["cas"]="${DOMAIN}/rdconnect_cas:cas-4.1.x"
+	["casldap"]="${DOMAIN}/cas-ldap:cas-5.3.x"
+	["cas"]="${DOMAIN}/rdconnect_cas:cas-5.3.x"
 	["pla"]="${DOMAIN}/phpldapadmin:1.2.3"
 	["umi"]="${DOMAIN}/rdconnect-umi:latest"
 )
