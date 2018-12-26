@@ -29,11 +29,11 @@ if [ $# -ge 3 ] ; then
 	# Enabling the API as such, running as the destination user
 	sed -i "s#{DESTUSER}#${DESTUSER}#g" /tmp/umi.conf
 	sed -e '/<\/VirtualHost>/r /tmp/umi.conf' -e 'x;$G' -i /etc/httpd/conf.d/ssl.conf
-	rm /tmp/umi.conf
 	
 	# Cleaning up, root level
 	yum autoremove -y git gcc gcc-c++ automake flex bison make patch
 	yum clean all && rm -rf /var/cache/yum
+	rm -rf /tmp/*
 else
 	echo "ERROR: Incorrect number of parameters" 1>&2
 	exit 1

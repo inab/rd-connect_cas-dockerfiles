@@ -20,12 +20,14 @@ if [ $# -ge 3 ] ; then
 	cd "${CASCLONE}"
 	git checkout "${CAS_RELEASE}"
 	# Compiling CAS
-	./mvnw -B clean package
+	./mvnw -B -T 1C clean package
 	
 	# Compiling TGC (for CAS install script)
 	git clone -b "${TGCBRANCH}" https://github.com/mitreid-connect/json-web-key-generator.git "${TGCCLONE}"
 	cd "${TGCCLONE}"
-	"${CASCLONE}"/mvnw -B clean package
+	# As the repo does not contain the Maven wrapper, copy it from CAS repo
+	cp -dpr "${CASCLONE}"/{mvnw,maven} .
+	./mvnw -B -T 1C clean package
 
 	# Installing CAS
 	chown tomcat: "${CASCLONE}"/target/cas.war && cp -p "${CASCLONE}"/target/cas.war /var/lib/tomcat8/webapps
@@ -40,7 +42,7 @@ if [ $# -ge 3 ] ; then
 	git checkout "${CAS_MGMT_RELEASE}"
 
 	# Compiling CAS Management
-	./mvnw -B clean package
+	./mvnw -B -T 1C clean package
 
 	# Installing CAS Management
 	chown tomcat: "${CAS_MGMT_CLONE}"/target/cas-management.war

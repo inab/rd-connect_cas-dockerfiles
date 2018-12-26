@@ -30,6 +30,8 @@ if [ ! -f "/etc/cas/config/cas.properties" ] ; then
 			echo Waiting for the value at the credential broker
 			sleep 1
 		done
+		LDAP_SERVER="$(redis-cli -h "$CRED_BROKER" get ldapServer)"
+		CAS_LDAP_DN="$(redis-cli -h "$CRED_BROKER" get ldapDomainDN)"
 		CAS_LDAP_PASS="$(redis-cli -h "$CRED_BROKER" get ldapDomainPass)"
 	fi
 
@@ -39,7 +41,7 @@ if [ ! -f "/etc/cas/config/cas.properties" ] ; then
 	fi
 	
 	# Third, initialize Tomcat+CAS installation
-	/bin/bash -x "/tmp/cas-repo/etc/setup-cas-tomcat.sh" "${LOCAL_CAS_TOMCAT_CERTS_DIR}" "${CAS_CERTS_PROFILE}" "${CAS_LDAP_PASS}" '/etc/sysconfig/tomcat8' /tmp/tgc-repo/target/json-web-key-generator-*-jar-with-dependencies.jar
+	/bin/bash -x "/tmp/cas-repo/etc/setup-cas-tomcat.sh" "${LOCAL_CAS_TOMCAT_CERTS_DIR}" "${CAS_CERTS_PROFILE}" "${LDAP_SERVER}" "${CAS_LDAP_DN}" "${CAS_LDAP_PASS}" '/etc/sysconfig/tomcat8' /tmp/tgc-repo/target/json-web-key-generator-*-jar-with-dependencies.jar
 	
 	# Fourth, initialize CAS Management installation
 	/bin/bash -x "/tmp/cas-mgmt-repo/etc/setup-cas-management.sh" "${CAS_LDAP_PASS}"

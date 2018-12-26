@@ -38,6 +38,8 @@ fi
 
 # Storing the passwords in the initialization credentials broker
 if [ -n "$CRED_BROKER" -a -f /etc/openldap/for_sysadmin.txt ] ; then
+	redis-cli -h "$CRED_BROKER" set ldapServer "$(hostname)"
+	redis-cli -h "$CRED_BROKER" set ldapDomainDN "$(grep '^domainDN' /etc/openldap/for_sysadmin.txt | cut -f 2 -d =)"
 	redis-cli -h "$CRED_BROKER" set ldapDomainPass "$(grep '^domainPass' /etc/openldap/for_sysadmin.txt | cut -f 2 -d =)"
 fi
 

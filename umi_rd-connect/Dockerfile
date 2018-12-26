@@ -2,7 +2,7 @@ FROM	rd-connect.eu/httpd:2.4
 LABEL	description="RD-Connect User Management Interface" vendor="BSC-CNS" maintainer="José María Fernández <jose.m.fernandez@bsc.es>"
 
 # Arguments for the build script
-ARG	USERMANAGEMENT_CHECKOUT=477fab8c1ff4ea3d0a84b1f7e282c5071b5dec64
+ARG	USERMANAGEMENT_CHECKOUT=cce0df652b1976eac5fc0403b53c4817e284d5bb
 ARG	UMI_CHECKOUT=767a49c3b074f18dcfdb17d93f9ee2fe1e7deec1
 ARG	REQS_UI_CHECKOUT=ce168c557b7826a2f0c18e3a7754bf391359936f
 
