@@ -23,7 +23,7 @@ RUN	for d in manager host-manager ; do \
 
 # This entrypoint does the initialization work
 ADD	docker-entrypoint.bash	/usr/local/sbin
-RUN	mv /etc/supervisord.d/tomcat8* /root
-#ENTRYPOINT	[ "/usr/local/sbin/docker-entrypoint.bash" ]
+#RUN	mv /etc/supervisord.d/tomcat8* /root
+ENTRYPOINT	[ "/usr/local/sbin/docker-entrypoint.bash" ]
 # As we have added an entrypoint, we have to explicitly define a CMD, as it is not inherited
-#CMD	[ "/my_init" ]
+CMD	[ "/my_init" ]
